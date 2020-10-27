@@ -15,9 +15,9 @@ namespace Barembo.App.Core.ViewModels
 {
     public class LoginViewModel : BindableBase
     {
-        IStoreAccessService _storeAccessService;
-        ILoginService _loginService;
-        IEventAggregator _eventAggregator;
+        readonly IStoreAccessService _storeAccessService;
+        readonly ILoginService _loginService;
+        readonly IEventAggregator _eventAggregator;
 
         private string satelliteAddress;
         public string SatelliteAddress
