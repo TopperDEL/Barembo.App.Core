@@ -22,44 +22,44 @@ namespace Barembo.App.Core.ViewModels
         readonly ILoginService _loginService;
         readonly IEventAggregator _eventAggregator;
 
-        private string satelliteAddress;
+        private string _satelliteAddress;
         public string SatelliteAddress
         {
-            get { return satelliteAddress; }
-            set { SetProperty(ref satelliteAddress, value); }
+            get { return _satelliteAddress; }
+            set { SetProperty(ref _satelliteAddress, value); }
         }
 
-        private string apiKey;
+        private string _apiKey;
         public string ApiKey
         {
-            get { return apiKey; }
-            set { SetProperty(ref apiKey, value); }
+            get { return _apiKey; }
+            set { SetProperty(ref _apiKey, value); }
         }
 
-        private string secret;
+        private string _secret;
         public string Secret
         {
-            get { return secret; }
-            set { SetProperty(ref secret, value); }
+            get { return _secret; }
+            set { SetProperty(ref _secret, value); }
         }
 
-        private string secretVerify;
+        private string _secretVerify;
         public string SecretVerify
         {
-            get { return secretVerify; }
-            set { SetProperty(ref secretVerify, value); }
+            get { return _secretVerify; }
+            set { SetProperty(ref _secretVerify, value); }
         }
 
-        private bool loginFailed;
+        private bool _loginFailed;
         public bool LoginFailed
         {
-            get { return loginFailed; }
-            set { SetProperty(ref loginFailed, value); }
+            get { return _loginFailed; }
+            set { SetProperty(ref _loginFailed, value); }
         }
 
-        private DelegateCommand delegateCommand;
+        private DelegateCommand _loginCommand;
         public DelegateCommand LoginCommand =>
-            delegateCommand ?? (delegateCommand = new DelegateCommand(ExecuteLoginCommand, CanExecuteLoginCommand));
+            _loginCommand ?? (_loginCommand = new DelegateCommand(ExecuteLoginCommand, CanExecuteLoginCommand));
 
         void ExecuteLoginCommand()
         {

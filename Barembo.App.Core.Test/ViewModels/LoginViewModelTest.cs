@@ -106,7 +106,7 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _loginServiceMock.Setup(s => s.Login(access)).Returns(true).Verifiable();
 
-            _eventAggregator.Setup(s => s.GetEvent<SuccessfullyLoggedInMessage>()).Returns(loggedInMessage);
+            _eventAggregator.Setup(s => s.GetEvent<SuccessfullyLoggedInMessage>()).Returns(loggedInMessage).Verifiable();
 
             _viewModel.LoginCommand.Execute();
 
@@ -132,7 +132,7 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _loginServiceMock.Setup(s => s.Login(access)).Returns(true).Verifiable();
 
-            _eventAggregator.Setup(s => s.GetEvent<SuccessfullyLoggedInMessage>()).Returns(loggedInMessage);
+            _eventAggregator.Setup(s => s.GetEvent<SuccessfullyLoggedInMessage>()).Returns(loggedInMessage).Verifiable();
 
             _viewModel.LoginCommand.Execute();
 
