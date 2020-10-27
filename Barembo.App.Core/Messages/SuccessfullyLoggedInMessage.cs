@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Barembo.App.Core.Messages
 {
+    /// <summary>
+    /// This message gets send whenever a Login was successfull
+    /// </summary>
     public class SuccessfullyLoggedInMessage: PubSubEvent<StoreAccess>
     {
     }
