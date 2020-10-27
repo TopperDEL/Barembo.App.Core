@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-	<RootNamespace>Barembo</RootNamespace>
+	<RootNamespace>Barembo.App.Core</RootNamespace>
     <Authors>Tim Parth</Authors>
     <Company>Tim Parth</Company>
     <Description>The package contains the core for the Barembo-App</Description>
@@ -16,18 +16,9 @@
     <Version>0.9.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Barembo.Connector" Version="0.9.1" />
+    <PackageReference Include="Barembo.Connector" Version="0.9.2" />
     <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
-    <Compile Update="**\*.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
-  </ItemGroup>
+  </ItemGroup> 
   <ItemGroup>
     <None Include="..\BaremboLogo.png">
       <Pack>True</Pack>

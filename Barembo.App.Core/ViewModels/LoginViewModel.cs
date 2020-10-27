@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace Barembo.App.Core.ViewModels
 {
+    /// <summary>
+    /// The ViewModel for the LoginView
+    /// </summary>
     public class LoginViewModel : BindableBase
     {
         readonly IStoreAccessService _storeAccessService;
@@ -65,7 +68,7 @@ namespace Barembo.App.Core.ViewModels
             loginData.SatelliteAddress = SatelliteAddress;
             loginData.Secret = Secret;
 
-            var storeAccess = _storeAccessService.GenerateAccesFromLogin(loginData);
+            var storeAccess = _storeAccessService.GenerateAccessFromLogin(loginData);
             var loggedIn = _loginService.Login(storeAccess);
             if (loggedIn)
                 _eventAggregator.GetEvent<SuccessfullyLoggedInMessage>().Publish(storeAccess);

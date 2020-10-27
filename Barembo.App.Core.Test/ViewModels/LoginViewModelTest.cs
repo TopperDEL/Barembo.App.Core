@@ -100,7 +100,7 @@ namespace Barembo.App.Core.Test.ViewModels
             StoreAccess access = new StoreAccess("myAccess");
             SuccessfullyLoggedInMessage loggedInMessage = new SuccessfullyLoggedInMessage();
 
-            _storeAccessServiceMock.Setup(s => s.GenerateAccesFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
+            _storeAccessServiceMock.Setup(s => s.GenerateAccessFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
                                                                                                   l.SatelliteAddress == _viewModel.SatelliteAddress &&
                                                                                                   l.Secret == _viewModel.Secret))).Returns(access).Verifiable();
 
@@ -126,7 +126,7 @@ namespace Barembo.App.Core.Test.ViewModels
             StoreAccess access = new StoreAccess("myAccess");
             SuccessfullyLoggedInMessage loggedInMessage = new SuccessfullyLoggedInMessage();
 
-            _storeAccessServiceMock.Setup(s => s.GenerateAccesFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
+            _storeAccessServiceMock.Setup(s => s.GenerateAccessFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
                                                                                                   l.SatelliteAddress == _viewModel.SatelliteAddress &&
                                                                                                   l.Secret == _viewModel.Secret))).Returns(access).Verifiable();
 
@@ -152,7 +152,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _viewModel.ApiKey = "apiKey";
             StoreAccess access = new StoreAccess("myAccess");
 
-            _storeAccessServiceMock.Setup(s => s.GenerateAccesFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
+            _storeAccessServiceMock.Setup(s => s.GenerateAccessFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
                                                                                                   l.SatelliteAddress == _viewModel.SatelliteAddress &&
                                                                                                   l.Secret == _viewModel.Secret))).Returns(access).Verifiable();
 
