@@ -3,19 +3,17 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
 	<RootNamespace>Barembo</RootNamespace>
-    <!-- Ensures the .xr.xml files are generated in a proper layout folder -->
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
-    <Version>0.9.0</Version>
     <Authors>Tim Parth</Authors>
     <Company>Tim Parth</Company>
     <Description>The package contains the core for the Barembo-App</Description>
     <Copyright>Tim Parth</Copyright>
     <PackageProjectUrl>https://github.com/TopperDEL/Barembo.App.Core</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/TopperDEL/Barembo.App.Core</RepositoryUrl>
+    <PackageIcon>BaremboLogo.png</PackageIcon>
+	<RepositoryUrl>https://github.com/TopperDEL/Barembo.App.Core</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>barembo storj tardigrade eternity diary</PackageTags>
     <PackageReleaseNotes>First version - still WIP</PackageReleaseNotes>
-    <PackageIcon>BaremboLogo.png</PackageIcon>
+    <Version>0.9.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Barembo.Connector" Version="0.9.1" />
@@ -30,9 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\BaremboLogo.png">
