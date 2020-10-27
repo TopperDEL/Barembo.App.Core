@@ -18,7 +18,6 @@
   <ItemGroup>
     <PackageReference Include="Barembo.Connector" Version="0.9.1" />
     <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
-    <PackageReference Include="Uno.UI" Version="3.0.12" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
