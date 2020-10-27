@@ -151,7 +151,6 @@ namespace Barembo.App.Core.Test.ViewModels
             _viewModel.SecretVerify = "mySecretVerify";
             _viewModel.ApiKey = "apiKey";
             StoreAccess access = new StoreAccess("myAccess");
-            SuccessfullyLoggedInMessage loggedInMessage = new SuccessfullyLoggedInMessage();
 
             _storeAccessServiceMock.Setup(s => s.GenerateAccesFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
                                                                                                   l.SatelliteAddress == _viewModel.SatelliteAddress &&
