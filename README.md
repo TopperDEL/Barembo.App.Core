@@ -1,5 +1,5 @@
 # Barembo.App.Core
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/98f3c42dc7a847878d82f46b3e86b60a)](https://app.codacy.com/gh/TopperDEL/Barembo.App.Core?utm_source=github.com&utm_medium=referral&utm_content=TopperDEL/Barembo.App.Core&utm_campaign=Badge_Grade_Settings)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2c7b16e7aefa47f6a0e45de32c9816c5)](https://www.codacy.com/gh/TopperDEL/Barembo.App.Core/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TopperDEL/Barembo.App.Core&amp;utm_campaign=Badge_Grade)
 
  The Barembo-App-Core
