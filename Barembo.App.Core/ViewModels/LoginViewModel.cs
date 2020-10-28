@@ -26,28 +26,41 @@ namespace Barembo.App.Core.ViewModels
         public string SatelliteAddress
         {
             get { return _satelliteAddress; }
-            set { SetProperty(ref _satelliteAddress, value); }
+            set
+            {
+                SetProperty(ref _satelliteAddress, value);
+                LoginCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private string _apiKey;
         public string ApiKey
         {
             get { return _apiKey; }
-            set { SetProperty(ref _apiKey, value); }
+            set
+            {
+                SetProperty(ref _apiKey, value); LoginCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private string _secret;
         public string Secret
         {
             get { return _secret; }
-            set { SetProperty(ref _secret, value); }
+            set
+            {
+                SetProperty(ref _secret, value); LoginCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private string _secretVerify;
         public string SecretVerify
         {
             get { return _secretVerify; }
-            set { SetProperty(ref _secretVerify, value); }
+            set
+            {
+                SetProperty(ref _secretVerify, value); LoginCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private bool _loginFailed;
