@@ -91,6 +91,76 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public void Login_SetsSecretDoNotMatch_IfTheyAreNotEmptyAndDoNotMatch()
+        {
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "mySecret";
+            _viewModel.SecretVerify = "mySecretVerify";
+            _viewModel.ApiKey = "apiKey";
+
+            _viewModel.LoginCommand.CanExecute();
+
+            Assert.IsTrue(_viewModel.SecretsDoNotMatch);
+        }
+
+        [TestMethod]
+        public void Login_DoesNotSetSecretDoNotMatch_IfTheyAreEmpty()
+        {
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "mySecret";
+            _viewModel.SecretVerify = "";
+            _viewModel.ApiKey = "apiKey";
+
+            _viewModel.LoginCommand.CanExecute();
+
+            Assert.IsFalse(_viewModel.SecretsDoNotMatch);
+
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "";
+            _viewModel.SecretVerify = "mySecretVerifiy";
+            _viewModel.ApiKey = "apiKey";
+
+            _viewModel.LoginCommand.CanExecute();
+
+            Assert.IsFalse(_viewModel.SecretsDoNotMatch);
+        }
+
+        [TestMethod]
+        public void Login_DoesNotSetSecretDoNotMatch_IfOneIsEmptryButHaventMatchedBefore()
+        {
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "mySecret";
+            _viewModel.SecretVerify = "mySecretVerify";
+            _viewModel.ApiKey = "apiKey";
+
+            _viewModel.LoginCommand.CanExecute();
+
+            Assert.IsTrue(_viewModel.SecretsDoNotMatch);
+
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "mySecret";
+            _viewModel.SecretVerify = "";
+            _viewModel.ApiKey = "apiKey";
+
+            _viewModel.LoginCommand.CanExecute();
+
+            Assert.IsFalse(_viewModel.SecretsDoNotMatch);
+        }
+
+        [TestMethod]
+        public void Login_DoesNotSetSecretDoNotMatch_IfTheyMatch()
+        {
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "mySecret";
+            _viewModel.SecretVerify = "mySecret";
+            _viewModel.ApiKey = "apiKey";
+
+            _viewModel.LoginCommand.CanExecute();
+
+            Assert.IsFalse(_viewModel.SecretsDoNotMatch);
+        }
+
+        [TestMethod]
         public void ExecuteLogin_LogsIn()
         {
             _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";

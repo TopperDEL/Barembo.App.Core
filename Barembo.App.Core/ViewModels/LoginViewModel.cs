@@ -70,6 +70,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _loginFailed, value); }
         }
 
+        private bool _secretsDoNotMatch;
+        public bool SecretsDoNotMatch
+        {
+            get { return _secretsDoNotMatch; }
+            set { SetProperty(ref _secretsDoNotMatch, value); }
+        }
+
         private DelegateCommand _loginCommand;
         public DelegateCommand LoginCommand =>
             _loginCommand ?? (_loginCommand = new DelegateCommand(ExecuteLoginCommand, CanExecuteLoginCommand));
@@ -91,6 +98,8 @@ namespace Barembo.App.Core.ViewModels
 
         bool CanExecuteLoginCommand()
         {
+            SecretsDoNotMatch = false;
+
             if (string.IsNullOrEmpty(SatelliteAddress))
                 return false;
             if (string.IsNullOrEmpty(ApiKey))
@@ -100,7 +109,10 @@ namespace Barembo.App.Core.ViewModels
             if (string.IsNullOrEmpty(SecretVerify))
                 return false;
             if (Secret != SecretVerify)
+            {
+                SecretsDoNotMatch = true;
                 return false;
+            }
 
             return true;
         }
