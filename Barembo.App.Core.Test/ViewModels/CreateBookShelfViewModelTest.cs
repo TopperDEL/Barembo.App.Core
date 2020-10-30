@@ -30,7 +30,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public async Task Init_SetsStoreAccess_OnViewModel()
+        public void Init_SetsStoreAccess_OnViewModel()
         {
             _viewModel.Init(_storeAccess);
 
@@ -53,7 +53,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public async void Create_Creates_NewBookShelf()
+        public void Create_Creates_NewBookShelf()
         {
             BookShelf bookShelf = new BookShelf();
             bookShelf.OwnerName = "Tim";
@@ -69,7 +69,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public async void Create_Creates_PublishesCreatedMessage()
+        public void Create_Creates_PublishesCreatedMessage()
         {
             BookShelf bookShelf = new BookShelf();
             bookShelf.OwnerName = "Tim";
@@ -87,7 +87,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public async void Create_SetsError_IfCreationFailed()
+        public void Create_SetsError_IfCreationFailed()
         {
             BookShelf bookShelf = new BookShelf();
             bookShelf.OwnerName = "Tim";
