@@ -33,9 +33,9 @@ namespace Barembo.App.Core.ViewModels
 
         private DelegateCommand _createBookShelfCommand;
         public DelegateCommand CreateBookShelfCommand =>
-            _createBookShelfCommand ?? (_createBookShelfCommand = new DelegateCommand(ExecuteCreateBookShelfCommand, CanExecuteCreateBookShelfCommand));
+            _createBookShelfCommand ?? (_createBookShelfCommand = new DelegateCommand(async () => await ExecuteCreateBookShelfCommand(), CanExecuteCreateBookShelfCommand));
 
-        async void ExecuteCreateBookShelfCommand()
+        async Task ExecuteCreateBookShelfCommand()
         {
             CreationFailed = false;
 
