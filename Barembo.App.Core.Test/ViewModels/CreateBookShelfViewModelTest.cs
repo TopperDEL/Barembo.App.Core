@@ -61,11 +61,13 @@ namespace Barembo.App.Core.Test.ViewModels
             _viewModel.OwnerName = bookShelf.OwnerName;
 
             _bookShelfServiceMock.Setup(s => s.CreateAndSaveBookShelfAsync(_storeAccess, _viewModel.OwnerName)).Returns(Task.FromResult(bookShelf)).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<BookShelfCreatedMessage>().Publish(_storeAccess)).Verifiable();
 
             _viewModel.Init(_storeAccess);
             _viewModel.CreateBookShelfCommand.Execute();
 
             _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
         }
 
         [TestMethod]
