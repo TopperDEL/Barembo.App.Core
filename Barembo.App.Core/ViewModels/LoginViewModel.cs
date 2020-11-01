@@ -39,7 +39,8 @@ namespace Barembo.App.Core.ViewModels
             get { return _apiKey; }
             set
             {
-                SetProperty(ref _apiKey, value); LoginCommand.RaiseCanExecuteChanged();
+                SetProperty(ref _apiKey, value);
+                LoginCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -49,7 +50,8 @@ namespace Barembo.App.Core.ViewModels
             get { return _secret; }
             set
             {
-                SetProperty(ref _secret, value); LoginCommand.RaiseCanExecuteChanged();
+                SetProperty(ref _secret, value);
+                LoginCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -59,7 +61,8 @@ namespace Barembo.App.Core.ViewModels
             get { return _secretVerify; }
             set
             {
-                SetProperty(ref _secretVerify, value); LoginCommand.RaiseCanExecuteChanged();
+                SetProperty(ref _secretVerify, value);
+                LoginCommand.RaiseCanExecuteChanged();
             }
         }
 

@@ -21,7 +21,10 @@ namespace Barembo.App.Core.ViewModels
         public string OwnerName
         {
             get { return _ownerName; }
-            set { SetProperty(ref _ownerName, value); }
+            set { 
+                SetProperty(ref _ownerName, value);
+                CreateBookShelfCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private bool _creationFailed;
