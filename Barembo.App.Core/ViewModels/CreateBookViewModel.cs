@@ -23,7 +23,8 @@ namespace Barembo.App.Core.ViewModels
         public string BookName
         {
             get { return _bookName; }
-            set { 
+            set
+            {
                 SetProperty(ref _bookName, value);
                 CreateBookCommand.RaiseCanExecuteChanged();
             }
@@ -55,19 +56,16 @@ namespace Barembo.App.Core.ViewModels
         {
             CreationFailed = false;
 
-            try
+            var book = _bookService.CreateBook(BookName, BookDescription);
+            var contributor = new Contributor { Name = _bookShelf.OwnerName };
+
+            var added = await _bookShelfService.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, book, contributor);
+
+            if (added)
             {
-                var book = _bookService.CreateBook(BookName, BookDescription);
-                var contributor = new Contributor { Name = _bookShelf.OwnerName };
-
-                var added = await _bookShelfService.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, book, contributor);
-
-                if (added)
-                {
-                    _eventAggregator.GetEvent<BookCreatedMessage>().Publish(_storeAccess);
-                }
+                _eventAggregator.GetEvent<BookCreatedMessage>().Publish(_storeAccess);
             }
-            catch(Barembo.Exceptions.BookShelfCouldNotBeSavedException)
+            else
             {
                 CreationFailed = true;
             }

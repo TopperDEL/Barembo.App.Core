@@ -79,47 +79,53 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _bookServiceMock.Verify();
             _bookShelfServiceMock.Verify();
-            _eventAggregator.Verify();
         }
 
         [TestMethod]
         public void Create_Creates_PublishesCreatedMessage()
         {
-            //Book Book = new Book();
-            //Book.Name = "Tim";
+            Book book = new Book();
+            book.Name = "Tim's Book";
+            book.Description = "Description";
+            Contributor contributor = new Contributor();
+            contributor.Name = "contributor name";
 
-            //_viewModel.BookName = Book.Name;
+            _viewModel.BookName = book.Name;
+            _viewModel.BookDescription = book.Description;
 
-            //_bookServiceMock.Setup(s => s.CreateAndSaveBookAsync(_storeAccess, _viewModel.BookName)).Returns(Task.FromResult(Book)).Verifiable();
-            //_eventAggregator.Setup(s => s.GetEvent<BookCreatedMessage>().Publish(_storeAccess)).Verifiable();
+            _bookServiceMock.Setup(s => s.CreateBook(_viewModel.BookName, _viewModel.BookDescription)).Returns(book).Verifiable();
+            _bookShelfServiceMock.Setup(s => s.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, book, Moq.It.Is<Contributor>(c => c.Name == _bookShelf.OwnerName))).Returns(Task.FromResult(true)).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<BookCreatedMessage>().Publish(_storeAccess)).Verifiable();
 
-            //_viewModel.Init(_storeAccess, _bookShelf);
-            //_viewModel.CreateBookCommand.Execute();
+            _viewModel.Init(_storeAccess, _bookShelf);
+            _viewModel.CreateBookCommand.Execute();
 
-            //_bookServiceMock.Verify();
-            //_bookShelfServiceMock.Verify();
-            //_eventAggregator.Verify();
+            _eventAggregator.Verify();
         }
 
         [TestMethod]
         public void Create_SetsError_IfCreationFailed()
         {
-            //Book Book = new Book();
-            //Book.Name = "Tim";
+            Book book = new Book();
+            book.Name = "Tim's Book";
+            book.Description = "Description";
+            Contributor contributor = new Contributor();
+            contributor.Name = "contributor name";
 
-            //_viewModel.BookName = Book.Name;
+            _viewModel.BookName = book.Name;
+            _viewModel.BookDescription = book.Description;
 
-            //_bookServiceMock.Setup(s => s.CreateAndSaveBookAsync(_storeAccess, _viewModel.BookName)).Throws(new BookCouldNotBeSavedException()).Verifiable();
+            _bookServiceMock.Setup(s => s.CreateBook(_viewModel.BookName, _viewModel.BookDescription)).Returns(book).Verifiable();
+            _bookShelfServiceMock.Setup(s => s.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, book, Moq.It.Is<Contributor>(c => c.Name == _bookShelf.OwnerName))).Returns(Task.FromResult(false)).Verifiable();
 
-            //_viewModel.Init(_storeAccess, _bookShelf);
+            _viewModel.Init(_storeAccess, _bookShelf);
+            _viewModel.CreateBookCommand.Execute();
 
-            //_viewModel.CreateBookCommand.Execute();
+            Assert.IsTrue(_viewModel.CreationFailed);
 
-            //Assert.IsTrue(_viewModel.CreationFailed);
-
-            //_bookShelfServiceMock.Verify();
-            //_bookServiceMock.Verify();
-            //_eventAggregator.Verify();
+            _bookServiceMock.Verify();
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
         }
     }
 }
