@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Barembo.App.Core.Messages
 {
-    public class AddForeignBookMessage : PubSubEvent<StoreAccess>
+    public class AddForeignBookMessage : PubSubEvent<Tuple<StoreAccess, BookShelf>>
     {
     }
 }

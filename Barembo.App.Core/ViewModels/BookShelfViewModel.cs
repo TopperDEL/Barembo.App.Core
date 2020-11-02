@@ -39,7 +39,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteAddOwnBookCommand()
         {
-            _eventAggregator.GetEvent<AddOwnBookMessage>().Publish(_storeAccess);
+            _eventAggregator.GetEvent<AddOwnBookMessage>().Publish(new Tuple<StoreAccess,BookShelf>(_storeAccess, _bookShelf));
         }
 
         private DelegateCommand _addForeignBookCommand;
@@ -48,7 +48,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteAddForeignBookCommand()
         {
-            _eventAggregator.GetEvent<AddForeignBookMessage>().Publish(_storeAccess);
+            _eventAggregator.GetEvent<AddForeignBookMessage>().Publish(new Tuple<StoreAccess, BookShelf>(_storeAccess, _bookShelf));
         }
 
         public BookShelfViewModel(IBookShelfService bookShelfService, IEventAggregator eventAggregator)
