@@ -60,7 +60,7 @@ namespace Barembo.App.Core.ViewModels
         public static async Task<BookViewModel> CreateAsync(IBookService bookService, IEventAggregator eventAggregator, BookReference bookReference)
         {
             var bookVM = new BookViewModel(bookService, eventAggregator);
-            await bookVM.InitAsync(bookReference);
+            await bookVM.InitAsync(bookReference).ConfigureAwait(false);
 
             return bookVM;
         }
