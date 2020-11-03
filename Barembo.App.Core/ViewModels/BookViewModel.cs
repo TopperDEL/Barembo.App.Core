@@ -42,11 +42,11 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<ShareBookMessage>().Publish(_bookReference);
         }
 
-        private DelegateCommand _showBookEntriesCommand;
-        public DelegateCommand ShowBookEntriesCommand =>
-            _showBookEntriesCommand ?? (_showBookEntriesCommand = new DelegateCommand(ExecuteShowBookEntriesCommand));
+        private DelegateCommand _showEntriesCommand;
+        public DelegateCommand ShowEntriesCommand =>
+            _showEntriesCommand ?? (_showEntriesCommand = new DelegateCommand(ExecuteShowEntriesCommand));
 
-        void ExecuteShowBookEntriesCommand()
+        void ExecuteShowEntriesCommand()
         {
             _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(_bookReference);
         }

@@ -100,7 +100,7 @@ namespace Barembo.App.Core.Test.ViewModels
         {
             _eventAggregator.Setup(s => s.GetEvent<ShowBookEntriesMessage>()).Returns(new ShowBookEntriesMessage()).Verifiable();
 
-            _viewModel.ShowBookEntriesCommand.Execute();
+            _viewModel.ShowEntriesCommand.Execute();
 
             _eventAggregator.Verify();
         }
