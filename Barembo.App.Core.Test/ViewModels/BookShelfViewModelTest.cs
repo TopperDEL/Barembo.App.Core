@@ -5,6 +5,7 @@ using Barembo.Interfaces;
 using Barembo.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Prism.Events;
+using Prism.Ioc;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,6 +19,7 @@ namespace Barembo.App.Core.Test.ViewModels
         BookShelfViewModel _viewModel;
         Moq.Mock<IBookShelfService> _bookShelfServiceMock;
         Moq.Mock<IEventAggregator> _eventAggregator;
+        Moq.Mock<IBookService> _bookService;
         StoreAccess _storeAccess;
 
         [TestInitialize]
@@ -26,7 +28,8 @@ namespace Barembo.App.Core.Test.ViewModels
             _storeAccess = new StoreAccess("use this access");
             _bookShelfServiceMock = new Moq.Mock<IBookShelfService>();
             _eventAggregator = new Moq.Mock<IEventAggregator>();
-            _viewModel = new BookShelfViewModel(_bookShelfServiceMock.Object, _eventAggregator.Object);
+            _bookService = new Moq.Mock<IBookService>();
+            _viewModel = new BookShelfViewModel(_bookShelfServiceMock.Object, _eventAggregator.Object, _bookService.Object);
         }
 
         [TestMethod]

@@ -4,6 +4,7 @@ using Barembo.Interfaces;
 using Barembo.Models;
 using Prism.Commands;
 using Prism.Events;
+using Prism.Ioc;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace Barembo.App.Core.ViewModels
     public class BookShelfViewModel : BindableBase
     {
         readonly IBookShelfService _bookShelfService;
+        readonly IBookService _bookService;
         readonly IEventAggregator _eventAggregator;
         internal StoreAccess _storeAccess;
 
@@ -51,10 +53,11 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<AddForeignBookMessage>().Publish(new Tuple<StoreAccess, BookShelf>(_storeAccess, _bookShelf));
         }
 
-        public BookShelfViewModel(IBookShelfService bookShelfService, IEventAggregator eventAggregator)
+        public BookShelfViewModel(IBookShelfService bookShelfService, IEventAggregator eventAggregator, IBookService bookService)
         {
             _bookShelfService = bookShelfService;
             _eventAggregator = eventAggregator;
+            _bookService = bookService;
 
             Books = new ObservableCollection<BookViewModel>();
         }
@@ -68,7 +71,7 @@ namespace Barembo.App.Core.ViewModels
 
                 foreach(var bookReference in BookShelf.Content)
                 {
-                    var bookVM = new BookViewModel(bookReference);
+                    var bookVM = await BookViewModel.CreateAsync(_bookService, _eventAggregator, bookReference);
                     Books.Add(bookVM);
                 }
             }
