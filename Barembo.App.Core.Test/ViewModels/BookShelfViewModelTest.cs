@@ -19,7 +19,7 @@ namespace Barembo.App.Core.Test.ViewModels
         BookShelfViewModel _viewModel;
         Moq.Mock<IBookShelfService> _bookShelfServiceMock;
         Moq.Mock<IEventAggregator> _eventAggregator;
-        Moq.Mock<IBookService> _bookService;
+        Moq.Mock<IBookService> _bookServiceMock;
         StoreAccess _storeAccess;
 
         [TestInitialize]
@@ -28,8 +28,8 @@ namespace Barembo.App.Core.Test.ViewModels
             _storeAccess = new StoreAccess("use this access");
             _bookShelfServiceMock = new Moq.Mock<IBookShelfService>();
             _eventAggregator = new Moq.Mock<IEventAggregator>();
-            _bookService = new Moq.Mock<IBookService>();
-            _viewModel = new BookShelfViewModel(_bookShelfServiceMock.Object, _eventAggregator.Object, _bookService.Object);
+            _bookServiceMock = new Moq.Mock<IBookService>();
+            _viewModel = new BookShelfViewModel(_bookShelfServiceMock.Object, _eventAggregator.Object, _bookServiceMock.Object);
         }
 
         [TestMethod]

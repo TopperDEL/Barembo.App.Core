@@ -1,5 +1,7 @@
-﻿using Barembo.Interfaces;
+﻿using Barembo.App.Core.Messages;
+using Barembo.Interfaces;
 using Barembo.Models;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
@@ -22,7 +24,34 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref book, value); }
         }
 
-        private BookViewModel(IBookService bookService, IEventAggregator eventAggregator)
+        private DelegateCommand _createEntryCommand;
+        public DelegateCommand CreateEntryCommand =>
+            _createEntryCommand ?? (_createEntryCommand = new DelegateCommand(ExecuteCreateEntryCommand));
+
+        void ExecuteCreateEntryCommand()
+        {
+            _eventAggregator.GetEvent<CreateBookEntryMessage>().Publish(_bookReference);
+        }
+
+        private DelegateCommand _shareBookCommand;
+        public DelegateCommand ShareBookCommand =>
+            _shareBookCommand ?? (_shareBookCommand = new DelegateCommand(ExecuteShareBookCommand));
+
+        void ExecuteShareBookCommand()
+        {
+            _eventAggregator.GetEvent<ShareBookMessage>().Publish(_bookReference);
+        }
+
+        private DelegateCommand _showBookEntriesCommand;
+        public DelegateCommand ShowBookEntriesCommand =>
+            _showBookEntriesCommand ?? (_showBookEntriesCommand = new DelegateCommand(ExecuteShowBookEntriesCommand));
+
+        void ExecuteShowBookEntriesCommand()
+        {
+            _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(_bookReference);
+        }
+
+        internal BookViewModel(IBookService bookService, IEventAggregator eventAggregator)
         {
             _bookService = bookService;
             _eventAggregator = eventAggregator;
