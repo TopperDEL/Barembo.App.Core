@@ -41,7 +41,7 @@ namespace Barembo.App.Core.ViewModels
 
             var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, entry);
 
-            _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<BookReference, EntryReference>(_bookReference, entryReference));
+            _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(entryReference);
         }
 
         bool CanExecuteSaveEntryCommand()
