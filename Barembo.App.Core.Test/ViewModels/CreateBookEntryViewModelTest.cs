@@ -17,12 +17,10 @@ namespace Barembo.App.Core.Test.ViewModels
         CreateBookEntryViewModel _viewModel;
         Moq.Mock<IEntryService> _entryServiceMock;
         Moq.Mock<IEventAggregator> _eventAggregator;
-        StoreAccess _storeAccess;
 
         [TestInitialize]
         public void Init()
         {
-            _storeAccess = new StoreAccess("use this access");
             _eventAggregator = new Moq.Mock<IEventAggregator>();
             _entryServiceMock = new Moq.Mock<IEntryService>();
             _viewModel = new CreateBookEntryViewModel(_entryServiceMock.Object, _eventAggregator.Object);
