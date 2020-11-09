@@ -12,18 +12,24 @@ namespace Barembo.App.Core.ViewModels
         private readonly IEntryService _entryService;
         private Entry _entry;
 
+        private string _header;
         public string Header
         {
-            get
-            {
-                if (_entry == null)
-                {
-                    LoadEntry();
-                    return "...";
-                }
-                return _entry.Header;
-            }
+            get { return _header; }
+            set { SetProperty(ref _header, value); }
         }
+        //public string Header
+        //{
+        //    get
+        //    {
+        //        if (_entry == null)
+        //        {
+        //            LoadEntry();
+        //            return "...";
+        //        }
+        //        return _entry.Header;
+        //    }
+        //}
 
         public string Body
         {
@@ -58,6 +64,8 @@ namespace Barembo.App.Core.ViewModels
         {
             _entryReference = entryReference;
             _entryService = entryService;
+
+            _header = "...";
         }
 
         private void LoadEntry()
@@ -73,12 +81,13 @@ namespace Barembo.App.Core.ViewModels
         private void InitFromEntry(Entry entry)
         {
             _entry = entry;
+            Header = _entry.Header;
 
             IsLoading = false;
 
-            RaisePropertyChanged(nameof(Header));
-            RaisePropertyChanged(nameof(Body));
-            RaisePropertyChanged(nameof(Thumbnail));
+            //RaisePropertyChanged(nameof(Header));
+            //RaisePropertyChanged(nameof(Body));
+            //RaisePropertyChanged(nameof(Thumbnail));
         }
     }
 }
