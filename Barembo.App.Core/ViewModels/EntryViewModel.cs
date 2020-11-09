@@ -3,6 +3,7 @@ using Barembo.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Barembo.App.Core.ViewModels
 {
@@ -12,24 +13,18 @@ namespace Barembo.App.Core.ViewModels
         private readonly IEntryService _entryService;
         private Entry _entry;
 
-        private string _header;
         public string Header
         {
-            get { return _header; }
-            set { SetProperty(ref _header, value); }
+            get
+            {
+                if (_entry == null)
+                {
+                    LoadEntry();
+                    return "...";
+                }
+                return _entry.Header;
+            }
         }
-        //public string Header
-        //{
-        //    get
-        //    {
-        //        if (_entry == null)
-        //        {
-        //            LoadEntry();
-        //            return "...";
-        //        }
-        //        return _entry.Header;
-        //    }
-        //}
 
         public string Body
         {
@@ -64,30 +59,27 @@ namespace Barembo.App.Core.ViewModels
         {
             _entryReference = entryReference;
             _entryService = entryService;
-
-            _header = "...";
         }
 
         private void LoadEntry()
         {
             if (IsLoading)
                 return;
-            
+
             IsLoading = true;
 
-            _entryService.LoadEntryAsSoonAsPossible(_entryReference, (loadedEntry) => InitFromEntry(loadedEntry), () => IsLoading = false);
+            _entryService.LoadEntryAsSoonAsPossible(_entryReference, (loadedEntry) => SynchronizationContext.Current.Post((o) => InitFromEntry(loadedEntry), null), () => IsLoading = false);
         }
 
         private void InitFromEntry(Entry entry)
         {
             _entry = entry;
-            Header = _entry.Header;
 
             IsLoading = false;
 
-            //RaisePropertyChanged(nameof(Header));
-            //RaisePropertyChanged(nameof(Body));
-            //RaisePropertyChanged(nameof(Thumbnail));
+            RaisePropertyChanged(nameof(Header));
+            RaisePropertyChanged(nameof(Body));
+            RaisePropertyChanged(nameof(Thumbnail));
         }
     }
 }
