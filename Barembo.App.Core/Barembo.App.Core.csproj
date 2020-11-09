@@ -13,10 +13,14 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>barembo storj tardigrade eternity diary</PackageTags>
     <PackageReleaseNotes>First version - still WIP</PackageReleaseNotes>
-    <Version>0.9.11</Version>
+    <Version>0.9.12</Version>
   </PropertyGroup>
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+</PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Barembo.Connector" Version="0.9.8" />
+    <PackageReference Include="Barembo.Connector" Version="0.9.10" />
     <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
   </ItemGroup> 
   <ItemGroup>

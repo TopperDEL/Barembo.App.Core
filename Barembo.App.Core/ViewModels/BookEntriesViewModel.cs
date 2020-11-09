@@ -15,11 +15,6 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _entries, value); }
         }
 
-        public BookEntriesViewModel()
-        {
-
-        }
-
         public void InitEntries(ObservableCollection<EntryViewModel> entries)
         {
             _entries = entries;
