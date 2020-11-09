@@ -11,6 +11,7 @@ namespace Barembo.App.Core.ViewModels
     {
         private readonly EntryReference _entryReference;
         private readonly IEntryService _entryService;
+        private readonly SynchronizationContext _synchronizationContext;
         private Entry _entry;
 
         public string Header
@@ -55,31 +56,35 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public EntryViewModel(EntryReference entryReference, IEntryService entryService)
+        public EntryViewModel(EntryReference entryReference, IEntryService entryService, SynchronizationContext synchronizationContext)
         {
             _entryReference = entryReference;
             _entryService = entryService;
+            _synchronizationContext = synchronizationContext;
         }
 
         private void LoadEntry()
         {
             if (IsLoading)
                 return;
-
+            
             IsLoading = true;
 
-            _entryService.LoadEntryAsSoonAsPossible(_entryReference, (loadedEntry) => SynchronizationContext.Current.Post((o) => InitFromEntry(loadedEntry), null), () => IsLoading = false);
+            _entryService.LoadEntryAsSoonAsPossible(_entryReference, (loadedEntry) => InitFromEntry(loadedEntry), () => IsLoading = false);
         }
 
         private void InitFromEntry(Entry entry)
         {
-            _entry = entry;
+            _synchronizationContext.Post((o) =>
+            {
+                _entry = entry;
 
-            IsLoading = false;
+                IsLoading = false;
 
-            RaisePropertyChanged(nameof(Header));
-            RaisePropertyChanged(nameof(Body));
-            RaisePropertyChanged(nameof(Thumbnail));
+                RaisePropertyChanged(nameof(Header));
+                RaisePropertyChanged(nameof(Body));
+                RaisePropertyChanged(nameof(Thumbnail));
+            }, null);
         }
     }
 }
