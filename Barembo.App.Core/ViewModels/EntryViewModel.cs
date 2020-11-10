@@ -1,5 +1,8 @@
-﻿using Barembo.Interfaces;
+﻿using Barembo.App.Core.Messages;
+using Barembo.Interfaces;
 using Barembo.Models;
+using Prism.Commands;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +14,7 @@ namespace Barembo.App.Core.ViewModels
     {
         private readonly EntryReference _entryReference;
         private readonly IEntryService _entryService;
+        private readonly IEventAggregator _eventAggregator;
         private readonly SynchronizationContext _synchronizationContext;
         private Entry _entry;
 
@@ -56,10 +60,20 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public EntryViewModel(EntryReference entryReference, IEntryService entryService, SynchronizationContext synchronizationContext)
+        private DelegateCommand delegateCommand;
+        public DelegateCommand GoBackCommand =>
+            delegateCommand ?? (delegateCommand = new DelegateCommand(ExecuteGoBackCommand));
+
+        void ExecuteGoBackCommand()
+        {
+            _eventAggregator.GetEvent<GoBackMessage>().Publish();
+        }
+
+        public EntryViewModel(EntryReference entryReference, IEntryService entryService, IEventAggregator eventAggregator, SynchronizationContext synchronizationContext)
         {
             _entryReference = entryReference;
             _entryService = entryService;
+            _eventAggregator = eventAggregator;
             _synchronizationContext = synchronizationContext;
         }
 
@@ -67,24 +81,28 @@ namespace Barembo.App.Core.ViewModels
         {
             if (IsLoading)
                 return;
-            
+
             IsLoading = true;
 
-            _entryService.LoadEntryAsSoonAsPossible(_entryReference, (loadedEntry) => InitFromEntry(loadedEntry), () => IsLoading = false);
+            _entryService.LoadEntryAsSoonAsPossible(
+                _entryReference, //The entry to load
+                (loadedEntry) =>
+                    _synchronizationContext.Post((o) =>
+                    {
+                        InitFromEntry(loadedEntry);
+                    }, null), //If the entry got loaded, Refresh the values on the UI-Thread
+                () => IsLoading = false); //If the entry failed to load, reset the IsLoading to start a new attempt
         }
 
-        private void InitFromEntry(Entry entry)
+        internal void InitFromEntry(Entry entry)
         {
-            _synchronizationContext.Post((o) =>
-            {
-                _entry = entry;
+            _entry = entry;
 
-                IsLoading = false;
+            IsLoading = false;
 
-                RaisePropertyChanged(nameof(Header));
-                RaisePropertyChanged(nameof(Body));
-                RaisePropertyChanged(nameof(Thumbnail));
-            }, null);
+            RaisePropertyChanged(nameof(Header));
+            RaisePropertyChanged(nameof(Body));
+            RaisePropertyChanged(nameof(Thumbnail));
         }
     }
 }
