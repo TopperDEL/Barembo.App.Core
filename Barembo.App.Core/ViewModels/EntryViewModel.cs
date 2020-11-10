@@ -14,7 +14,6 @@ namespace Barembo.App.Core.ViewModels
     {
         private readonly EntryReference _entryReference;
         private readonly IEntryService _entryService;
-        private readonly IEventAggregator _eventAggregator;
         private readonly SynchronizationContext _synchronizationContext;
         private Entry _entry;
 
@@ -60,20 +59,10 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        private DelegateCommand delegateCommand;
-        public DelegateCommand GoBackCommand =>
-            delegateCommand ?? (delegateCommand = new DelegateCommand(ExecuteGoBackCommand));
-
-        void ExecuteGoBackCommand()
-        {
-            _eventAggregator.GetEvent<GoBackMessage>().Publish();
-        }
-
-        public EntryViewModel(EntryReference entryReference, IEntryService entryService, IEventAggregator eventAggregator, SynchronizationContext synchronizationContext)
+        public EntryViewModel(EntryReference entryReference, IEntryService entryService, SynchronizationContext synchronizationContext)
         {
             _entryReference = entryReference;
             _entryService = entryService;
-            _eventAggregator = eventAggregator;
             _synchronizationContext = synchronizationContext;
         }
 

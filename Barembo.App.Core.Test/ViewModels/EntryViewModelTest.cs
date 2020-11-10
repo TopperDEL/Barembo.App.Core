@@ -15,7 +15,6 @@ namespace Barembo.App.Core.Test.ViewModels
     {
         EntryViewModel _viewModel;
         Moq.Mock<IEntryService> _entryServiceMock;
-        Moq.Mock<IEventAggregator> _eventAggregator;
         EntryReference _entryReference;
         Moq.Mock<System.Threading.SynchronizationContext> _syncConMock;
 
@@ -24,9 +23,8 @@ namespace Barembo.App.Core.Test.ViewModels
         {
             _entryReference = new EntryReference();
             _entryServiceMock = new Moq.Mock<IEntryService>();
-            _eventAggregator = new Moq.Mock<IEventAggregator>();
             _syncConMock = new Moq.Mock<System.Threading.SynchronizationContext>();
-            _viewModel = new EntryViewModel(_entryReference, _entryServiceMock.Object, _eventAggregator.Object, _syncConMock.Object);
+            _viewModel = new EntryViewModel(_entryReference, _entryServiceMock.Object, _syncConMock.Object);
         }
 
         [TestMethod]
@@ -80,16 +78,6 @@ namespace Barembo.App.Core.Test.ViewModels
             var header = _viewModel.Header; //Access property
 
             Assert.IsFalse(_viewModel.IsLoading);
-            _entryServiceMock.VerifyNoOtherCalls();
-        }
-
-        [TestMethod]
-        public void GoBack_Goes_Back()
-        {
-            _eventAggregator.Setup(s => s.GetEvent<GoBackMessage>()).Returns(new GoBackMessage()).Verifiable();
-            _viewModel.GoBackCommand.Execute();
-
-            _eventAggregator.Verify();
             _entryServiceMock.VerifyNoOtherCalls();
         }
     }
