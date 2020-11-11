@@ -6,6 +6,8 @@ using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,6 +33,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _body, value); }
         }
 
+        private ObservableCollection<Tuple<Attachment, Stream>> _attachments;
+        public ObservableCollection<Tuple<Attachment, Stream>> Attachments
+        {
+            get { return _attachments; }
+            private set { SetProperty(ref _attachments, value); }
+        }
+
         private DelegateCommand _saveEntryCommand;
         public DelegateCommand SaveEntryCommand =>
             _saveEntryCommand ?? (_saveEntryCommand = new DelegateCommand(async () => await ExecuteSaveEntryCommand().ConfigureAwait(false), CanExecuteSaveEntryCommand));
@@ -40,6 +49,13 @@ namespace Barembo.App.Core.ViewModels
             Entry entry = _entryService.CreateEntry(Header, Body);
 
             var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, entry);
+
+            bool setAsThumbnail = true;
+            foreach(var attachment in Attachments)
+            {
+                await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Item1, attachment.Item2, setAsThumbnail);
+                setAsThumbnail = false;
+            }
 
             _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(entryReference);
         }
@@ -53,6 +69,8 @@ namespace Barembo.App.Core.ViewModels
         {
             _entryService = entryService;
             _eventAggregator = eventAggregator;
+
+            Attachments = new ObservableCollection<Tuple<Attachment, Stream>>();
         }
 
         public void Init(BookReference bookReference)
