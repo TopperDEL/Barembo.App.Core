@@ -64,6 +64,7 @@ namespace Barembo.App.Core.ViewModels
 
         public async Task InitAsync(StoreAccess storeAccess)
         {
+            Books.Clear();
             _storeAccess = storeAccess;
             try
             {
