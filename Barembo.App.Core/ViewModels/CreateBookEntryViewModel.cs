@@ -44,6 +44,15 @@ namespace Barembo.App.Core.ViewModels
         public DelegateCommand SaveEntryCommand =>
             _saveEntryCommand ?? (_saveEntryCommand = new DelegateCommand(async () => await ExecuteSaveEntryCommand().ConfigureAwait(false), CanExecuteSaveEntryCommand));
 
+        private DelegateCommand _goBackCommand;
+        public DelegateCommand GoBackCommand =>
+            _goBackCommand ?? (_goBackCommand = new DelegateCommand(ExecuteGoBackCommand));
+
+        void ExecuteGoBackCommand()
+        {
+            _eventAggregator.GetEvent<GoBackMessage>().Publish();
+        }
+
         async Task ExecuteSaveEntryCommand()
         {
             Entry entry = _entryService.CreateEntry(Header, Body);
