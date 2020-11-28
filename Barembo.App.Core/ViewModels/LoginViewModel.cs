@@ -73,6 +73,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _loginFailed, value); }
         }
 
+        private string _loginError;
+        public string LoginError
+        {
+            get { return _loginError; }
+            set { SetProperty(ref _loginError, value); }
+        }
+
         private bool _secretsDoNotMatch;
         public bool SecretsDoNotMatch
         {
@@ -91,12 +98,25 @@ namespace Barembo.App.Core.ViewModels
             loginData.SatelliteAddress = SatelliteAddress;
             loginData.Secret = Secret;
 
-            var storeAccess = _storeAccessService.GenerateAccessFromLogin(loginData);
+            StoreAccess storeAccess;
+            try
+            {
+                storeAccess = _storeAccessService.GenerateAccessFromLogin(loginData);
+            }
+            catch
+            {
+                LoginFailed = true;
+                LoginError = "Could not generate access";
+                return;
+            }
             var loggedIn = _loginService.Login(storeAccess);
             if (loggedIn)
                 _eventAggregator.GetEvent<SuccessfullyLoggedInMessage>().Publish(storeAccess);
             else
+            {
                 LoginFailed = true;
+                LoginError = "Could not log in";
+            }
         }
 
         bool CanExecuteLoginCommand()

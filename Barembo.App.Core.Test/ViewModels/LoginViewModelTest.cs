@@ -187,6 +187,52 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public void ExecuteLogin_RaisesError_IfCouldNotGenerateAccess()
+        {
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "mySecret";
+            _viewModel.SecretVerify = "mySecretVerify";
+            _viewModel.ApiKey = "apiKey";
+            StoreAccess access = new StoreAccess("myAccess");
+
+            _storeAccessServiceMock.Setup(s => s.GenerateAccessFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
+                                                                                                  l.SatelliteAddress == _viewModel.SatelliteAddress &&
+                                                                                                  l.Secret == _viewModel.Secret))).Throws(new Exception()).Verifiable();
+
+            _viewModel.LoginCommand.Execute();
+
+            Assert.IsTrue(_viewModel.LoginFailed);
+            Assert.AreEqual(_viewModel.LoginError, "Could not generate access");
+
+            _storeAccessServiceMock.Verify();
+            _loginServiceMock.VerifyNoOtherCalls();
+        }
+
+        [TestMethod]
+        public void ExecuteLogin_RaisesError_IfCouldNotLogIn()
+        {
+            _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
+            _viewModel.Secret = "mySecret";
+            _viewModel.SecretVerify = "mySecretVerify";
+            _viewModel.ApiKey = "apiKey";
+            StoreAccess access = new StoreAccess("myAccess");
+
+            _storeAccessServiceMock.Setup(s => s.GenerateAccessFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
+                                                                                                  l.SatelliteAddress == _viewModel.SatelliteAddress &&
+                                                                                                  l.Secret == _viewModel.Secret))).Returns(access).Verifiable();
+
+            _loginServiceMock.Setup(s => s.Login(access)).Returns(false).Verifiable();
+
+            _viewModel.LoginCommand.Execute();
+
+            Assert.IsTrue(_viewModel.LoginFailed);
+            Assert.AreEqual(_viewModel.LoginError, "Could not log in");
+
+            _storeAccessServiceMock.Verify();
+            _loginServiceMock.Verify();
+        }
+
+        [TestMethod]
         public void ExecuteLogin_LogsIn_AndRaisesLoggedInEvent()
         {
             _viewModel.SatelliteAddress = "europe-west-1.tardigrade.io:7777";
