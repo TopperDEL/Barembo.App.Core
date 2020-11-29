@@ -103,10 +103,10 @@ namespace Barembo.App.Core.ViewModels
             {
                 storeAccess = _storeAccessService.GenerateAccessFromLogin(loginData);
             }
-            catch
+            catch (Exception ex)
             {
                 LoginFailed = true;
-                LoginError = "Could not generate access";
+                LoginError = "Could not generate access - " + ex.Message;
                 return;
             }
             var loggedIn = _loginService.Login(storeAccess);

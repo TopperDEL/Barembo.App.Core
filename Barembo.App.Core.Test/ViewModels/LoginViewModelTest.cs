@@ -197,12 +197,12 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _storeAccessServiceMock.Setup(s => s.GenerateAccessFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
                                                                                                   l.SatelliteAddress == _viewModel.SatelliteAddress &&
-                                                                                                  l.Secret == _viewModel.Secret))).Throws(new Exception()).Verifiable();
+                                                                                                  l.Secret == _viewModel.Secret))).Throws(new Exception("Test")).Verifiable();
 
             _viewModel.LoginCommand.Execute();
 
             Assert.IsTrue(_viewModel.LoginFailed);
-            Assert.AreEqual(_viewModel.LoginError, "Could not generate access");
+            Assert.AreEqual(_viewModel.LoginError, "Could not generate access - Test");
 
             _storeAccessServiceMock.Verify();
             _loginServiceMock.VerifyNoOtherCalls();
