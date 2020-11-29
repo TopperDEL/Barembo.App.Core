@@ -25,10 +25,10 @@ namespace Barembo.App.Core.ViewModels
         private string _baremboVersion;
         public string BaremboVersion
         {
-            get { return _storjVersion; }
+            get { return _baremboVersion; }
             set
             {
-                SetProperty(ref _storjVersion, value);
+                SetProperty(ref _baremboVersion, value);
             }
         }
 
