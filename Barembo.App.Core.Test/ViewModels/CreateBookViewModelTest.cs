@@ -82,6 +82,30 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public void Create_Creates_NewBookAndRespectsCoverImage()
+        {
+            Book book = new Book();
+            book.Name = "Tim's Book";
+            book.Description = "Description";
+            Contributor contributor = new Contributor();
+            contributor.Name = "contributor name";
+
+            _viewModel.BookName = book.Name;
+            _viewModel.BookDescription = book.Description;
+            _viewModel.CoverImageBase64 = "imageBase64";
+
+            _bookServiceMock.Setup(s => s.CreateBook(_viewModel.BookName, _viewModel.BookDescription)).Returns(book).Verifiable();
+            _bookShelfServiceMock.Setup(s => s.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, Moq.It.Is<Book>(b=>b.CoverImageBase64 == _viewModel.CoverImageBase64), Moq.It.Is<Contributor>(c => c.Name == _bookShelf.OwnerName))).Returns(Task.FromResult(true)).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<BookCreatedMessage>().Publish(_storeAccess)).Verifiable();
+
+            _viewModel.Init(_storeAccess, _bookShelf);
+            _viewModel.CreateBookCommand.Execute();
+
+            _bookServiceMock.Verify();
+            _bookShelfServiceMock.Verify();
+        }
+
+        [TestMethod]
         public void Create_Creates_PublishesCreatedMessage()
         {
             Book book = new Book();

@@ -41,6 +41,16 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
+        private string _coverImageBase64;
+        public string CoverImageBase64
+        {
+            get { return _coverImageBase64; }
+            set
+            {
+                SetProperty(ref _coverImageBase64, value);
+            }
+        }
+
         private bool _creationFailed;
         public bool CreationFailed
         {
@@ -67,6 +77,8 @@ namespace Barembo.App.Core.ViewModels
 
             var book = _bookService.CreateBook(BookName, BookDescription);
             var contributor = new Contributor { Name = _bookShelf.OwnerName };
+
+            book.CoverImageBase64 = CoverImageBase64;
 
             var added = await _bookShelfService.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, book, contributor);
 
