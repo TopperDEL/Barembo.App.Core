@@ -127,5 +127,14 @@ namespace Barembo.App.Core.Test.ViewModels
             _bookShelfServiceMock.Verify();
             _eventAggregator.Verify();
         }
+
+        [TestMethod]
+        public void GoBack_Goes_Back()
+        {
+            _eventAggregator.Setup(s => s.GetEvent<GoBackMessage>()).Returns(new GoBackMessage()).Verifiable();
+            _viewModel.GoBackCommand.Execute();
+
+            _eventAggregator.Verify();
+        }
     }
 }

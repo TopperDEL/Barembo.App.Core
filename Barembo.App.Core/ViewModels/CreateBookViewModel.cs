@@ -52,6 +52,15 @@ namespace Barembo.App.Core.ViewModels
         public DelegateCommand CreateBookCommand =>
             _createBookCommand ?? (_createBookCommand = new DelegateCommand(async () => await ExecuteCreateBookCommand().ConfigureAwait(false), CanExecuteCreateBookCommand));
 
+        private DelegateCommand _goBackCommand;
+        public DelegateCommand GoBackCommand =>
+            _goBackCommand ?? (_goBackCommand = new DelegateCommand(ExecuteGoBackCommand));
+
+        void ExecuteGoBackCommand()
+        {
+            _eventAggregator.GetEvent<GoBackMessage>().Publish();
+        }
+
         async Task ExecuteCreateBookCommand()
         {
             CreationFailed = false;
