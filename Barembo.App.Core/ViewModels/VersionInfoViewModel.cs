@@ -15,15 +15,9 @@ namespace Barembo.App.Core.ViewModels
         private string _storjVersion;
         public string StorjVersion
         {
-            get {
-                try
-                {
-                    return _storeAccessService.GetVersionInfo();
-                }
-                catch (Exception ex)
-                {
-                    return ex.Message;
-                }
+            get
+            {
+                return _storjVersion;
             }
             set
             {
@@ -46,20 +40,20 @@ namespace Barembo.App.Core.ViewModels
             _storeAccessService = storeAccessService;
             _buildVersionInfo = buildVersionInfo;
 
-            //try
-            //{
-            //    StorjVersion = _storeAccessService.GetVersionInfo();
-            //}
-            //catch (Exception ex)
-            //{
-            //    StorjVersion = ex.Message;
-            //}
+            try
+            {
+                StorjVersion = _storeAccessService.GetVersionInfo();
+            }
+            catch (Exception ex)
+            {
+                StorjVersion = ex.Message;
+            }
 
             try
             {
                 BaremboVersion = _buildVersionInfo.GetBaremboVersion();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 BaremboVersion = ex.Message;
             }
