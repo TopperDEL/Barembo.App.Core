@@ -133,5 +133,56 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _eventAggregator.Verify();
         }
+
+        [TestMethod]
+        public void AddMediaCommand_Raises_MediaRequestedMessage()
+        {
+            _eventAggregator.Setup(s => s.GetEvent<MediaRequestedMessage>()).Returns(new MediaRequestedMessage()).Verifiable();
+            _viewModel.AddMediaCommand.Execute();
+
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
+        public void AddMediaCommand_AddsAttachment_IfSelected()
+        {
+            var attachment = new Attachment();
+            attachment.FileName = "test.jpg";
+            var stream = new MemoryStream();
+            var message = new Moq.Mock<MediaRequestedMessage>();
+
+            _eventAggregator.Setup(s => s.GetEvent<MediaRequestedMessage>()).Returns(message.Object).Verifiable();
+            message.Setup(s => s.Publish(Moq.It.IsAny<MediaResult>()))
+                .Callback<MediaResult>(e =>
+                {
+                    e.MediaSelected = true;
+                    e.Attachment = attachment;
+                    e.Stream = stream;
+                }).Verifiable();
+
+            _viewModel.AddMediaCommand.Execute();
+            Assert.AreEqual(attachment,_viewModel.Attachments[0].Item1);
+            Assert.AreEqual(stream,_viewModel.Attachments[0].Item2);
+
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
+        public void AddMediaCommand_DoesNothing_IfNotSelected()
+        {
+            var message = new Moq.Mock<MediaRequestedMessage>();
+
+            _eventAggregator.Setup(s => s.GetEvent<MediaRequestedMessage>()).Returns(message.Object).Verifiable();
+            message.Setup(s => s.Publish(Moq.It.IsAny<MediaResult>()))
+                .Callback<MediaResult>(e =>
+                {
+                    e.MediaSelected = false;
+                }).Verifiable();
+
+            _viewModel.AddMediaCommand.Execute();
+            Assert.AreEqual(0, _viewModel.Attachments.Count);
+
+            _eventAggregator.Verify();
+        }
     }
 }

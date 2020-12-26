@@ -44,6 +44,10 @@ namespace Barembo.App.Core.ViewModels
         public DelegateCommand SaveEntryCommand =>
             _saveEntryCommand ?? (_saveEntryCommand = new DelegateCommand(async () => await ExecuteSaveEntryCommand().ConfigureAwait(false), CanExecuteSaveEntryCommand));
 
+        private DelegateCommand _addMediaCommand;
+        public DelegateCommand AddMediaCommand =>
+            _saveEntryCommand ?? (_addMediaCommand = new DelegateCommand(() => ExecuteAddMediaCommand(), CanExecuteAddMediaCommand));
+
         private DelegateCommand _goBackCommand;
         public DelegateCommand GoBackCommand =>
             _goBackCommand ?? (_goBackCommand = new DelegateCommand(ExecuteGoBackCommand));
@@ -70,6 +74,21 @@ namespace Barembo.App.Core.ViewModels
         }
 
         bool CanExecuteSaveEntryCommand()
+        {
+            return true;
+        }
+
+        void ExecuteAddMediaCommand()
+        {
+            MediaResult result = new MediaResult();
+            _eventAggregator.GetEvent<MediaRequestedMessage>().Publish(result);
+            if(result.MediaSelected)
+            {
+                _attachments.Add(new Tuple<Attachment, Stream>(result.Attachment, result.Stream));
+            }
+        }
+
+        bool CanExecuteAddMediaCommand()
         {
             return true;
         }
