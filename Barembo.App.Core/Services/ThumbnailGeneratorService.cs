@@ -25,7 +25,7 @@ namespace Barembo.App.Core.Services
                 int width = 600;
                 int X = bmp.Width;
                 int Y = bmp.Height;
-                int height = (int)((width * Y) / X);
+                int height = (width * Y) / X;
 
                 var thumbnail = bmp.GetThumbnailImage(width, height, myCallback, IntPtr.Zero);
                 MemoryStream thumbStream = new MemoryStream();

@@ -46,7 +46,7 @@ namespace Barembo.App.Core.ViewModels
 
         private DelegateCommand _addMediaCommand;
         public DelegateCommand AddMediaCommand =>
-            _saveEntryCommand ?? (_addMediaCommand = new DelegateCommand(() => ExecuteAddMediaCommand(), CanExecuteAddMediaCommand));
+            _addMediaCommand ?? (_addMediaCommand = new DelegateCommand(() => ExecuteAddMediaCommand(), CanExecuteAddMediaCommand));
 
         private DelegateCommand _goBackCommand;
         public DelegateCommand GoBackCommand =>

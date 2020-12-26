@@ -9,9 +9,6 @@ namespace Barembo.App.Core.ViewModels
 {
     public class VersionInfoViewModel : BindableBase
     {
-        readonly IStoreAccessService _storeAccessService;
-        readonly IBuildVersionInfoService _buildVersionInfo;
-
         private string _storjVersion;
         public string StorjVersion
         {
@@ -37,12 +34,9 @@ namespace Barembo.App.Core.ViewModels
 
         public VersionInfoViewModel(IStoreAccessService storeAccessService, IBuildVersionInfoService buildVersionInfo)
         {
-            _storeAccessService = storeAccessService;
-            _buildVersionInfo = buildVersionInfo;
-
             try
             {
-                StorjVersion = _storeAccessService.GetVersionInfo();
+                StorjVersion = storeAccessService.GetVersionInfo();
             }
             catch (Exception ex)
             {
@@ -51,7 +45,7 @@ namespace Barembo.App.Core.ViewModels
 
             try
             {
-                BaremboVersion = _buildVersionInfo.GetBaremboVersion();
+                BaremboVersion = buildVersionInfo.GetBaremboVersion();
             }
             catch (Exception ex)
             {
