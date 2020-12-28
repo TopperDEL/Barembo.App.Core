@@ -10,12 +10,14 @@ using System.Threading;
 
 namespace Barembo.App.Core.ViewModels
 {
+    public delegate void EntryLoadedDelegate(EntryViewModel vm, Entry entry);
     public class EntryViewModel : AsyncLoadingBindableBase
     {
         private readonly EntryReference _entryReference;
         private readonly IEntryService _entryService;
         private readonly SynchronizationContext _synchronizationContext;
         private Entry _entry;
+        public event EntryLoadedDelegate EntryLoaded;
 
         public string Header
         {
@@ -86,6 +88,8 @@ namespace Barembo.App.Core.ViewModels
         internal void InitFromEntry(Entry entry)
         {
             _entry = entry;
+
+            EntryLoaded?.Invoke(this, _entry);
 
             IsLoading = false;
 
