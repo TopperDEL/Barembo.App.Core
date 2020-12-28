@@ -66,7 +66,10 @@ namespace Barembo.App.Core.ViewModels
             bool setAsThumbnail = true;
             foreach(var attachment in Attachments)
             {
-                await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Item1, attachment.Item2, setAsThumbnail);
+                //ToDo: Error handling
+                await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Item1, attachment.Item2);
+                if (setAsThumbnail)
+                    await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Item2);
                 setAsThumbnail = false;
             }
 

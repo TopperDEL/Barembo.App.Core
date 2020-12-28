@@ -79,7 +79,7 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary, true)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
             _viewModel.Init(bookReference);
@@ -98,24 +98,26 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _viewModel.Header = "header";
             _viewModel.Body = "body";
-            MemoryStream attachmentBinary = new MemoryStream(Encoding.UTF8.GetBytes("Barembo rockz"));
+            MemoryStream attachmentBinary1 = new MemoryStream(Encoding.UTF8.GetBytes("Barembo rockz"));
+            MemoryStream attachmentBinary2 = new MemoryStream(Encoding.UTF8.GetBytes("Barembo really rockz"));
 
             Attachment attachment1 = new Attachment();
             attachment1.FileName = "attachment1.jpg";
             attachment1.Type = AttachmentType.Image;
-            attachment1.Size = attachmentBinary.Length;
-            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment1, attachmentBinary));
+            attachment1.Size = attachmentBinary1.Length;
+            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment1, attachmentBinary1));
 
             Attachment attachment2 = new Attachment();
             attachment2.FileName = "attachment2.jpg";
             attachment2.Type = AttachmentType.Image;
-            attachment2.Size = attachmentBinary.Length;
-            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment2, attachmentBinary));
+            attachment2.Size = attachmentBinary2.Length;
+            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment2, attachmentBinary2));
 
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment1, attachmentBinary, true)).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment2, attachmentBinary, false)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment1, attachmentBinary1)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachmentBinary1)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment2, attachmentBinary2)).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
             _viewModel.Init(bookReference);
