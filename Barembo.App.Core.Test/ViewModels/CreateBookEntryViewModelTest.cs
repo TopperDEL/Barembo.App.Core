@@ -1,5 +1,6 @@
 ﻿using Barembo.App.Core.Messages;
 using Barembo.App.Core.ViewModels;
+using Barembo.Exceptions;
 using Barembo.Interfaces;
 using Barembo.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,6 +32,9 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Publishes_Message()
         {
             BookReference bookReference = new BookReference();
+            Entry entry = new Entry();
+
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
 
             _viewModel.Init(bookReference);
@@ -79,8 +83,9 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
+            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
 
             _viewModel.Init(bookReference);
             _viewModel.SaveEntryCommand.Execute();
@@ -119,6 +124,104 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachmentBinary1)).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment2, attachmentBinary2)).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
+
+            _viewModel.Init(bookReference);
+            _viewModel.SaveEntryCommand.Execute();
+
+            _eventAggregator.Verify();
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public void ExecuteSaveEntry_RaisesError_IfEntryCouldNotBeCreated()
+        {
+            BookReference bookReference = new BookReference();
+            Entry entry = null;
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
+
+            _viewModel.Init(bookReference);
+            _viewModel.SaveEntryCommand.Execute();
+
+            _eventAggregator.Verify();
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public void ExecuteSaveEntry_RaisesError_IfEntryCouldNotBeAddedToBook()
+        {
+            BookReference bookReference = new BookReference();
+            Entry entry = new Entry();
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
+            _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Throws(new EntryCouldNotBeSavedException()).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
+
+            _viewModel.Init(bookReference);
+            _viewModel.SaveEntryCommand.Execute();
+
+            _eventAggregator.Verify();
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public void ExecuteSaveEntry_RaisesError_IfAttachmentCouldNotBeSaved()
+        {
+            BookReference bookReference = new BookReference();
+            EntryReference entryRef = new EntryReference();
+            Entry entry = new Entry();
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+            MemoryStream attachmentBinary = new MemoryStream(Encoding.UTF8.GetBytes("Barembo rockz"));
+
+            Attachment attachment = new Attachment();
+            attachment.FileName = "attachment1.jpg";
+            attachment.Type = AttachmentType.Image;
+            attachment.Size = attachmentBinary.Length;
+            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment, attachmentBinary));
+
+            _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
+            _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
+            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(false)).Verifiable();
+
+            _viewModel.Init(bookReference);
+            _viewModel.SaveEntryCommand.Execute();
+
+            _eventAggregator.Verify();
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public void ExecuteSaveEntry_RaisesError_IfThumbnailCouldNotBeSet()
+        {
+            BookReference bookReference = new BookReference();
+            EntryReference entryRef = new EntryReference();
+            Entry entry = new Entry();
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+            MemoryStream attachmentBinary = new MemoryStream(Encoding.UTF8.GetBytes("Barembo rockz"));
+
+            Attachment attachment = new Attachment();
+            attachment.FileName = "attachment1.jpg";
+            attachment.Type = AttachmentType.Image;
+            attachment.Size = attachmentBinary.Length;
+            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment, attachmentBinary));
+
+            _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
+            _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
+            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachmentBinary)).Returns(Task.FromResult(false)).Verifiable();
 
             _viewModel.Init(bookReference);
             _viewModel.SaveEntryCommand.Execute();
