@@ -93,7 +93,7 @@ namespace Barembo.App.Core.ViewModels
                     setAsThumbnail = false;
                 }
 
-                _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(entryReference);
+                _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, _entry));
             }
             catch(EntryCouldNotBeSavedException ex)
             {
