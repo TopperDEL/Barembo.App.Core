@@ -109,12 +109,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteAddMediaCommand()
         {
-            MediaResult result = new MediaResult();
-            _eventAggregator.GetEvent<MediaRequestedMessage>().Publish(result);
-            if(result.MediaSelected)
-            {
-                _attachments.Add(new Tuple<Attachment, Stream>(result.Attachment, result.Stream));
-            }
+            _eventAggregator.GetEvent<MediaRequestedMessage>().Publish();
         }
 
         bool CanExecuteAddMediaCommand()
@@ -126,6 +121,7 @@ namespace Barembo.App.Core.ViewModels
         {
             _entryService = entryService;
             _eventAggregator = eventAggregator;
+            _eventAggregator.GetEvent<MediaReceivedMessage>().Subscribe(HandleMediaReceived);
 
             Attachments = new ObservableCollection<Tuple<Attachment, Stream>>();
         }
@@ -133,6 +129,11 @@ namespace Barembo.App.Core.ViewModels
         public void Init(BookReference bookReference)
         {
             _bookReference = bookReference;
+        }
+
+        private void HandleMediaReceived(MediaData mediaData)
+        {
+            _attachments.Add(new Tuple<Attachment, Stream>(mediaData.Attachment, mediaData.Stream));
         }
     }
 }
