@@ -9,7 +9,6 @@ namespace Barembo.App.Core.Messages
 {
     public class MediaData
     {
-        public bool MediaSelected { get; set; }
         public Stream Stream { get; set; }
         public Attachment Attachment { get; set; }
     }
