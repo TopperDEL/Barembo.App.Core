@@ -1,4 +1,5 @@
-﻿using Barembo.Models;
+﻿using Barembo.App.Core.Messages;
+using Barembo.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,6 @@ namespace Barembo.App.Core.Interfaces
 {
     public interface IMediaFetchService
     {
-        Task<Tuple<Attachment, Stream>> FetchMediaAsync();
+        Task<MediaData> FetchMediaAsync();
     }
 }
