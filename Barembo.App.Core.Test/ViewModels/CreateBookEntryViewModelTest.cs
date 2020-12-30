@@ -248,5 +248,19 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _eventAggregator.Verify();
         }
+
+        [TestMethod]
+        public void MediaReceivedMessage_Adds_Attachment()
+        {
+            MediaData data = new MediaData();
+            data.Attachment = new Attachment();
+            data.Stream = new MemoryStream();
+
+            _viewModel.HandleMediaReceived(data);
+
+            Assert.AreEqual(1, _viewModel.Attachments.Count);
+            Assert.AreEqual(data.Attachment, _viewModel.Attachments[0].Item1);
+            Assert.AreEqual(data.Stream, _viewModel.Attachments[0].Item2);
+        }
     }
 }

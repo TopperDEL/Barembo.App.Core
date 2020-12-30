@@ -131,7 +131,7 @@ namespace Barembo.App.Core.ViewModels
             _bookReference = bookReference;
         }
 
-        private void HandleMediaReceived(MediaData mediaData)
+        internal void HandleMediaReceived(MediaData mediaData)
         {
             _attachments.Add(new Tuple<Attachment, Stream>(mediaData.Attachment, mediaData.Stream));
         }
