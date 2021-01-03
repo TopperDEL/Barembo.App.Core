@@ -52,7 +52,7 @@ namespace Barembo.App.Core.ViewModels
                 if (_entry == null)
                 {
                     LoadEntry();
-                    return null; //ToDo: Return placeholder-Image
+                    return null;
                 }
                 else if (string.IsNullOrEmpty(_entry.ThumbnailBase64))
                     return null;
