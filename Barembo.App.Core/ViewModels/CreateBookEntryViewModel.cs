@@ -82,7 +82,7 @@ namespace Barembo.App.Core.ViewModels
                     }
                     if (setAsThumbnail)
                     {
-                        var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Item2);
+                        var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Item1, attachment.Item2);
                         if (!thumbnailSet)
                         {
                             _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.Item1.FileName));
