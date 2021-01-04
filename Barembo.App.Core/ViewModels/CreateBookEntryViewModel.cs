@@ -58,11 +58,10 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<GoBackMessage>().Publish();
         }
 
-        private Entry _entry;
         async Task ExecuteSaveEntryCommand()
         {
-            _entry = _entryService.CreateEntry(Header, Body);
-            if(_entry == null)
+            var entry = _entryService.CreateEntry(Header, Body);
+            if(entry == null)
             {
                 _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeCreated, ""));
                 return;
@@ -70,12 +69,12 @@ namespace Barembo.App.Core.ViewModels
 
             try
             {
-                var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, _entry);
+                var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, entry);
 
                 bool setAsThumbnail = true;
                 foreach (var attachment in Attachments)
                 {
-                    var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, _entry, attachment.Item1, attachment.Item2);
+                    var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Item1, attachment.Item2);
                     if(!attachmentAdded)
                     {
                         _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.Item1.FileName));
@@ -83,7 +82,7 @@ namespace Barembo.App.Core.ViewModels
                     }
                     if (setAsThumbnail)
                     {
-                        var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, _entry, attachment.Item2);
+                        var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Item2);
                         if (!thumbnailSet)
                         {
                             _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.Item1.FileName));
@@ -93,12 +92,11 @@ namespace Barembo.App.Core.ViewModels
                     setAsThumbnail = false;
                 }
 
-                _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, _entry));
+                _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, entry));
             }
             catch(EntryCouldNotBeSavedException ex)
             {
                 _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeSavedException, ex.Message));
-                return;
             }
         }
 
