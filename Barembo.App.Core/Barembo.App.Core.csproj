@@ -20,7 +20,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Barembo.Connector" Version="0.9.18" />
+    <PackageReference Include="Barembo.Connector" Version="0.9.19" />
     <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
   </ItemGroup> 

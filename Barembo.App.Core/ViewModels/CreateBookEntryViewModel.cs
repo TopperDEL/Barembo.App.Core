@@ -34,8 +34,8 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _body, value); }
         }
 
-        private ObservableCollection<Tuple<Attachment, Stream>> _attachments;
-        public ObservableCollection<Tuple<Attachment, Stream>> Attachments
+        private ObservableCollection<MediaData> _attachments;
+        public ObservableCollection<MediaData> Attachments
         {
             get { return _attachments; }
             private set { SetProperty(ref _attachments, value); }
@@ -74,18 +74,18 @@ namespace Barembo.App.Core.ViewModels
                 bool setAsThumbnail = true;
                 foreach (var attachment in Attachments)
                 {
-                    var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Item1, attachment.Item2);
+                    var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Attachment, attachment.Stream);
                     if(!attachmentAdded)
                     {
-                        _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.Item1.FileName));
+                        _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.Attachment.FileName));
                         return;
                     }
                     if (setAsThumbnail)
                     {
-                        var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Item1, attachment.Item2);
+                        var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Attachment, attachment.Stream, attachment.FilePath);
                         if (!thumbnailSet)
                         {
-                            _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.Item1.FileName));
+                            _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.Attachment.FileName));
                             return;
                         }
                     }
@@ -121,7 +121,7 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator = eventAggregator;
             _eventAggregator.GetEvent<MediaReceivedMessage>().Subscribe(HandleMediaReceived);
 
-            Attachments = new ObservableCollection<Tuple<Attachment, Stream>>();
+            Attachments = new ObservableCollection<MediaData>();
         }
 
         public void Init(BookReference bookReference)
@@ -131,7 +131,7 @@ namespace Barembo.App.Core.ViewModels
 
         internal void HandleMediaReceived(MediaData mediaData)
         {
-            _attachments.Add(new Tuple<Attachment, Stream>(mediaData.Attachment, mediaData.Stream));
+            _attachments.Add(mediaData);
         }
     }
 }

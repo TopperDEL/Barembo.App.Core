@@ -80,13 +80,13 @@ namespace Barembo.App.Core.Test.ViewModels
             attachment.FileName = "attachment1.jpg";
             attachment.Type = AttachmentType.Image;
             attachment.Size = attachmentBinary.Length;
-            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment, attachmentBinary));
+            _viewModel.Attachments.Add(new MediaData(){ Attachment = attachment, Stream = attachmentBinary, FilePath = "pathToFile" });
 
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
 
             _viewModel.Init(bookReference);
             _viewModel.SaveEntryCommand.Execute();
@@ -111,18 +111,18 @@ namespace Barembo.App.Core.Test.ViewModels
             attachment1.FileName = "attachment1.jpg";
             attachment1.Type = AttachmentType.Image;
             attachment1.Size = attachmentBinary1.Length;
-            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment1, attachmentBinary1));
+            _viewModel.Attachments.Add((new MediaData() { Attachment = attachment1, Stream = attachmentBinary1, FilePath = "pathToFile1" }));
 
             Attachment attachment2 = new Attachment();
             attachment2.FileName = "attachment2.jpg";
             attachment2.Type = AttachmentType.Image;
             attachment2.Size = attachmentBinary2.Length;
-            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment2, attachmentBinary2));
+            _viewModel.Attachments.Add(new MediaData() { Attachment = attachment2, Stream = attachmentBinary2, FilePath = "pathToFile2" });
 
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment1, attachmentBinary1)).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment1, attachmentBinary1)).Returns(Task.FromResult(true)).Verifiable();
+            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment1, attachmentBinary1, "pathToFile1")).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment2, attachmentBinary2)).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
@@ -187,7 +187,7 @@ namespace Barembo.App.Core.Test.ViewModels
             attachment.FileName = "attachment1.jpg";
             attachment.Type = AttachmentType.Image;
             attachment.Size = attachmentBinary.Length;
-            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment, attachmentBinary));
+            _viewModel.Attachments.Add(new MediaData() { Attachment = attachment, Stream = attachmentBinary, FilePath = "pathToFile" });
 
             _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
@@ -216,13 +216,13 @@ namespace Barembo.App.Core.Test.ViewModels
             attachment.FileName = "attachment1.jpg";
             attachment.Type = AttachmentType.Image;
             attachment.Size = attachmentBinary.Length;
-            _viewModel.Attachments.Add(new Tuple<Attachment, System.IO.Stream>(attachment, attachmentBinary));
+            _viewModel.Attachments.Add(new MediaData() { Attachment = attachment, Stream = attachmentBinary, FilePath = "pathToFile" });
 
             _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary)).Returns(Task.FromResult(false)).Verifiable();
+            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(false)).Verifiable();
 
             _viewModel.Init(bookReference);
             _viewModel.SaveEntryCommand.Execute();
@@ -255,12 +255,14 @@ namespace Barembo.App.Core.Test.ViewModels
             MediaData data = new MediaData();
             data.Attachment = new Attachment();
             data.Stream = new MemoryStream();
+            data.FilePath = "pathToFile";
 
             _viewModel.HandleMediaReceived(data);
 
             Assert.AreEqual(1, _viewModel.Attachments.Count);
-            Assert.AreEqual(data.Attachment, _viewModel.Attachments[0].Item1);
-            Assert.AreEqual(data.Stream, _viewModel.Attachments[0].Item2);
+            Assert.AreEqual(data.Attachment, _viewModel.Attachments[0].Attachment);
+            Assert.AreEqual(data.Stream, _viewModel.Attachments[0].Stream);
+            Assert.AreEqual(data.FilePath, _viewModel.Attachments[0].FilePath);
         }
     }
 }

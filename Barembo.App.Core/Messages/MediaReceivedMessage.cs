@@ -11,6 +11,7 @@ namespace Barembo.App.Core.Messages
     {
         public Stream Stream { get; set; }
         public Attachment Attachment { get; set; }
+        public string FilePath { get; set; }
     }
     public class MediaReceivedMessage : PubSubEvent<MediaData>
     {
