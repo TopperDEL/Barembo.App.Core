@@ -58,6 +58,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _creationFailed, value); }
         }
 
+        private bool _saveInProgress;
+        public bool SaveInProgress
+        {
+            get { return _saveInProgress; }
+            set { SetProperty(ref _saveInProgress, value); }
+        }
+
         private DelegateCommand _createBookCommand;
         public DelegateCommand CreateBookCommand =>
             _createBookCommand ?? (_createBookCommand = new DelegateCommand(async () => await ExecuteCreateBookCommand().ConfigureAwait(false), CanExecuteCreateBookCommand));
@@ -73,22 +80,30 @@ namespace Barembo.App.Core.ViewModels
 
         async Task ExecuteCreateBookCommand()
         {
-            CreationFailed = false;
-
-            var book = _bookService.CreateBook(BookName, BookDescription);
-            var contributor = new Contributor { Name = _bookShelf.OwnerName };
-
-            book.CoverImageBase64 = CoverImageBase64;
-
-            var added = await _bookShelfService.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, book, contributor);
-
-            if (added)
+            SaveInProgress = true;
+            try
             {
-                _eventAggregator.GetEvent<BookCreatedMessage>().Publish(_storeAccess);
+                CreationFailed = false;
+
+                var book = _bookService.CreateBook(BookName, BookDescription);
+                var contributor = new Contributor { Name = _bookShelf.OwnerName };
+
+                book.CoverImageBase64 = CoverImageBase64;
+
+                var added = await _bookShelfService.AddOwnBookToBookShelfAndSaveAsync(_storeAccess, book, contributor);
+
+                if (added)
+                {
+                    _eventAggregator.GetEvent<BookCreatedMessage>().Publish(_storeAccess);
+                }
+                else
+                {
+                    CreationFailed = true;
+                }
             }
-            else
+            finally
             {
-                CreationFailed = true;
+                SaveInProgress = false;
             }
         }
 
