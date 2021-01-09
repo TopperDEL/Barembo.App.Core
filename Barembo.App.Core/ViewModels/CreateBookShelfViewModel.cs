@@ -34,23 +34,39 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _creationFailed, value); }
         }
 
+        private bool _saveInProgress;
+        public bool SaveInProgress
+        {
+            get { return _saveInProgress; }
+            set { SetProperty(ref _saveInProgress, value); }
+        }
+
         private DelegateCommand _createBookShelfCommand;
         public DelegateCommand CreateBookShelfCommand =>
             _createBookShelfCommand ?? (_createBookShelfCommand = new DelegateCommand(async () => await ExecuteCreateBookShelfCommand().ConfigureAwait(false), CanExecuteCreateBookShelfCommand));
 
         async Task ExecuteCreateBookShelfCommand()
         {
-            CreationFailed = false;
+            SaveInProgress = true;
 
             try
             {
-                await _bookShelfService.CreateAndSaveBookShelfAsync(_storeAccess, OwnerName);
+                CreationFailed = false;
 
-                _eventAggregator.GetEvent<BookShelfCreatedMessage>().Publish(_storeAccess);
+                try
+                {
+                    await _bookShelfService.CreateAndSaveBookShelfAsync(_storeAccess, OwnerName);
+
+                    _eventAggregator.GetEvent<BookShelfCreatedMessage>().Publish(_storeAccess);
+                }
+                catch (Barembo.Exceptions.BookShelfCouldNotBeSavedException)
+                {
+                    CreationFailed = true;
+                }
             }
-            catch(Barembo.Exceptions.BookShelfCouldNotBeSavedException)
+            finally
             {
-                CreationFailed = true;
+                SaveInProgress = false;
             }
         }
 

@@ -71,6 +71,26 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public void Create_SetsAndClears_SaveInProgress()
+        {
+            BookShelf bookShelf = new BookShelf();
+            bookShelf.OwnerName = "Tim";
+
+            _viewModel.OwnerName = bookShelf.OwnerName;
+
+            _bookShelfServiceMock.Setup(s => s.CreateAndSaveBookShelfAsync(_storeAccess, _viewModel.OwnerName)).Returns(Task.FromResult(bookShelf)).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<BookShelfCreatedMessage>().Publish(_storeAccess)).Verifiable();
+
+            _viewModel.Init(_storeAccess);
+            Assert.IsFalse(_viewModel.SaveInProgress);
+            _viewModel.CreateBookShelfCommand.Execute();
+            Assert.IsFalse(_viewModel.SaveInProgress);
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
         public void Create_Creates_PublishesCreatedMessage()
         {
             BookShelf bookShelf = new BookShelf();
