@@ -66,6 +66,29 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public void ExecuteSaveEntry_SetsAndClears_SaveInProgress()
+        {
+            BookReference bookReference = new BookReference();
+            EntryReference entryRef = new EntryReference();
+            Entry entry = new Entry();
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+
+            _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
+            _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
+
+            _viewModel.Init(bookReference);
+            Assert.IsFalse(_viewModel.SaveInProgress);
+            _viewModel.SaveEntryCommand.Execute();
+            Assert.IsFalse(_viewModel.SaveInProgress);
+
+            _eventAggregator.Verify();
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
         public void ExecuteSaveEntry_Saves_Attachments()
         {
             BookReference bookReference = new BookReference();

@@ -34,6 +34,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _body, value); }
         }
 
+        private bool _saveInProgress;
+        public bool SaveInProgress
+        {
+            get { return _saveInProgress; }
+            set { SetProperty(ref _saveInProgress, value); }
+        }
+
         private ObservableCollection<MediaData> _attachments;
         public ObservableCollection<MediaData> Attachments
         {
@@ -64,49 +71,57 @@ namespace Barembo.App.Core.ViewModels
 
         async Task ExecuteSaveEntryCommand()
         {
-            var entry = _entryService.CreateEntry(Header, Body);
-            if(entry == null)
-            {
-                _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeCreated, ""));
-                return;
-            }
-
+            SaveInProgress = true;
             try
             {
-                var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, entry);
-
-                bool setAsThumbnail = true;
-                foreach (var attachment in Attachments)
+                var entry = _entryService.CreateEntry(Header, Body);
+                if (entry == null)
                 {
-                    var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Attachment, attachment.Stream);
-                    if(!attachmentAdded)
-                    {
-                        _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.Attachment.FileName));
-                        return;
-                    }
-                    if (setAsThumbnail)
-                    {
-                        var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Attachment, attachment.Stream, attachment.FilePath);
-                        if (!thumbnailSet)
-                        {
-                            _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.Attachment.FileName));
-                            return;
-                        }
-                    }
-                    setAsThumbnail = false;
+                    _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeCreated, ""));
+                    return;
                 }
 
-                _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, entry));
+                try
+                {
+                    var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, entry);
+
+                    bool setAsThumbnail = true;
+                    foreach (var attachment in Attachments)
+                    {
+                        var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.Attachment, attachment.Stream);
+                        if (!attachmentAdded)
+                        {
+                            _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.Attachment.FileName));
+                            return;
+                        }
+                        if (setAsThumbnail)
+                        {
+                            var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.Attachment, attachment.Stream, attachment.FilePath);
+                            if (!thumbnailSet)
+                            {
+                                _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.Attachment.FileName));
+                                return;
+                            }
+                        }
+                        setAsThumbnail = false;
+                    }
+
+                    _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, entry));
+                }
+                catch (EntryCouldNotBeSavedException ex)
+                {
+                    _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeSavedException, ex.Message));
+                }
             }
-            catch(EntryCouldNotBeSavedException ex)
+            finally
             {
-                _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeSavedException, ex.Message));
+                SaveInProgress = false;
             }
         }
 
         bool CanExecuteSaveEntryCommand()
         {
-            return true;
+            return !SaveInProgress;
         }
 
         void ExecuteAddMediaCommand(AttachmentType attachmentType)
