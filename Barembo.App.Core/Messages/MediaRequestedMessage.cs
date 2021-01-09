@@ -4,7 +4,7 @@ using System;
 
 namespace Barembo.App.Core.Messages
 {
-    public class MediaRequestedMessage : PubSubEvent
+    public class MediaRequestedMessage : PubSubEvent<AttachmentType>
     {
     }
 }

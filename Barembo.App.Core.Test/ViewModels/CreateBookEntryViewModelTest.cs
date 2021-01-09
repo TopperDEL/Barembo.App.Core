@@ -241,10 +241,19 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public void AddMediaCommand_Raises_MediaRequestedMessage()
+        public void AddImageCommand_Raises_MediaRequestedMessage()
         {
             _eventAggregator.Setup(s => s.GetEvent<MediaRequestedMessage>()).Returns(new MediaRequestedMessage()).Verifiable();
-            _viewModel.AddMediaCommand.Execute();
+            _viewModel.AddImageCommand.Execute();
+
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
+        public void AddVideoCommand_Raises_MediaRequestedMessage()
+        {
+            _eventAggregator.Setup(s => s.GetEvent<MediaRequestedMessage>()).Returns(new MediaRequestedMessage()).Verifiable();
+            _viewModel.AddVideoCommand.Execute();
 
             _eventAggregator.Verify();
         }

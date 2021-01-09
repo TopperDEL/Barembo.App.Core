@@ -45,9 +45,13 @@ namespace Barembo.App.Core.ViewModels
         public DelegateCommand SaveEntryCommand =>
             _saveEntryCommand ?? (_saveEntryCommand = new DelegateCommand(async () => await ExecuteSaveEntryCommand().ConfigureAwait(false), CanExecuteSaveEntryCommand));
 
-        private DelegateCommand _addMediaCommand;
-        public DelegateCommand AddMediaCommand =>
-            _addMediaCommand ?? (_addMediaCommand = new DelegateCommand(() => ExecuteAddMediaCommand(), CanExecuteAddMediaCommand));
+        private DelegateCommand _addImageCommand;
+        public DelegateCommand AddImageCommand =>
+            _addImageCommand ?? (_addImageCommand = new DelegateCommand(() => ExecuteAddMediaCommand(AttachmentType.Image), CanExecuteAddMediaCommand));
+
+        private DelegateCommand _addVideoCommand;
+        public DelegateCommand AddVideoCommand =>
+            _addVideoCommand ?? (_addVideoCommand = new DelegateCommand(() => ExecuteAddMediaCommand(AttachmentType.Video), CanExecuteAddMediaCommand));
 
         private DelegateCommand _goBackCommand;
         public DelegateCommand GoBackCommand =>
@@ -105,9 +109,9 @@ namespace Barembo.App.Core.ViewModels
             return true;
         }
 
-        void ExecuteAddMediaCommand()
+        void ExecuteAddMediaCommand(AttachmentType attachmentType)
         {
-            _eventAggregator.GetEvent<MediaRequestedMessage>().Publish();
+            _eventAggregator.GetEvent<MediaRequestedMessage>().Publish(attachmentType);
         }
 
         bool CanExecuteAddMediaCommand()
