@@ -12,7 +12,7 @@ namespace Barembo.App.Core.ViewModels
     {
         private readonly IThumbnailGeneratorService _thumbnailGeneratorService;
 
-        private string ThumbnailBase64 = null;
+        private string ThumbnailBase64;
 
         public MediaData MediaData { get; set; }
 
