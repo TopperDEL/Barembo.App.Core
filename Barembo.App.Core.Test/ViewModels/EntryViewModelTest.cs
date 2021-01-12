@@ -98,7 +98,7 @@ namespace Barembo.App.Core.Test.ViewModels
             await _viewModel.LoadAttachmentPreviewsAsync();
 
             Assert.AreEqual(1, _viewModel.AttachmentPreviews.Count);
-            Assert.AreEqual(preview, _viewModel.AttachmentPreviews[0]);
+            Assert.AreEqual(preview, _viewModel.AttachmentPreviews[0]._attachmentPreview);
             _entryServiceMock.Verify();
         }
 

@@ -8,7 +8,7 @@ namespace Barembo.App.Core.ViewModels
 {
     public class AttachmentPreviewViewModel : BindableBase
     {
-        readonly AttachmentPreview _attachmentPreview;
+        internal readonly AttachmentPreview _attachmentPreview;
 
         public bool IsImage
         {
