@@ -39,7 +39,7 @@ namespace Barembo.App.Core.ViewModels
         {
             get
             {
-                if (_videoPreviewBytes.Count > _currentVideoPreviewImageNumber)
+                if (_videoPreviewBytes != null && _videoPreviewBytes.Count > _currentVideoPreviewImageNumber)
                 {
                     return _videoPreviewBytes[_currentVideoPreviewImageNumber];
                 }
