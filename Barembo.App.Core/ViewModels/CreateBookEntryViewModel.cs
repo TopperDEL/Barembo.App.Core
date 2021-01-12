@@ -90,7 +90,7 @@ namespace Barembo.App.Core.ViewModels
                     bool setAsThumbnail = true;
                     foreach (var attachment in Attachments)
                     {
-                        var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.MediaData.Attachment, attachment.MediaData.Stream);
+                        var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
                         if (!attachmentAdded)
                         {
                             _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.MediaData.Attachment.FileName));
