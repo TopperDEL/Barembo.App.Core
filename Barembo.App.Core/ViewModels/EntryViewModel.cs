@@ -63,14 +63,14 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public ObservableCollection<AttachmentPreview> AttachmentPreviews { get; set; }
+        public ObservableCollection<AttachmentPreviewViewModel> AttachmentPreviews { get; set; }
 
         public EntryViewModel(EntryReference entryReference, IEntryService entryService, SynchronizationContext synchronizationContext)
         {
             _entryReference = entryReference;
             _entryService = entryService;
             _synchronizationContext = synchronizationContext;
-            AttachmentPreviews = new ObservableCollection<AttachmentPreview>();
+            AttachmentPreviews = new ObservableCollection<AttachmentPreviewViewModel>();
         }
 
         private void LoadEntry()
@@ -97,7 +97,7 @@ namespace Barembo.App.Core.ViewModels
                 foreach (var attachment in _entry.Attachments)
                 {
                     var preview = await _entryService.LoadAttachmentPreviewAsync(_entryReference, attachment);
-                    AttachmentPreviews.Add(preview);
+                    AttachmentPreviews.Add(new AttachmentPreviewViewModel(preview));
                 }
             }
         }
