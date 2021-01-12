@@ -5,8 +5,10 @@ using Prism.Commands;
 using Prism.Events;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Barembo.App.Core.ViewModels
 {
@@ -61,11 +63,14 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
+        public ObservableCollection<AttachmentPreview> AttachmentPreviews { get; set; }
+
         public EntryViewModel(EntryReference entryReference, IEntryService entryService, SynchronizationContext synchronizationContext)
         {
             _entryReference = entryReference;
             _entryService = entryService;
             _synchronizationContext = synchronizationContext;
+            AttachmentPreviews = new ObservableCollection<AttachmentPreview>();
         }
 
         private void LoadEntry()
@@ -83,6 +88,18 @@ namespace Barembo.App.Core.ViewModels
                         InitFromEntry(loadedEntry);
                     }, null), //If the entry got loaded, Refresh the values on the UI-Thread
                 () => IsLoading = false); //If the entry failed to load, reset the IsLoading to start a new attempt
+        }
+
+        public async Task LoadAttachmentPreviewsAsync()
+        {
+            if (_entry != null)
+            {
+                foreach (var attachment in _entry.Attachments)
+                {
+                    var preview = await _entryService.LoadAttachmentPreviewAsync(_entryReference, attachment);
+                    AttachmentPreviews.Add(preview);
+                }
+            }
         }
 
         internal void InitFromEntry(Entry entry)

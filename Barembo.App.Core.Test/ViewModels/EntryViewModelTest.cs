@@ -7,6 +7,7 @@ using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Barembo.App.Core.Test.ViewModels
 {
@@ -78,6 +79,34 @@ namespace Barembo.App.Core.Test.ViewModels
             var header = _viewModel.Header; //Access property
 
             Assert.IsFalse(_viewModel.IsLoading);
+            _entryServiceMock.VerifyNoOtherCalls();
+        }
+
+        [TestMethod]
+        public async Task LoadingAttachmentPreviews_Loads_AllPreviews()
+        {
+            Attachment attachment = new Attachment();
+            AttachmentPreview preview = new AttachmentPreview();
+            Entry entry = new Entry();
+            entry.Header = "Header";
+            entry.Body = "Body";
+            entry.Attachments.Add(attachment);
+
+            _entryServiceMock.Setup(s => s.LoadAttachmentPreviewAsync(_entryReference, attachment)).Returns(Task.FromResult(preview)).Verifiable();
+            _viewModel.InitFromEntry(entry);
+
+            await _viewModel.LoadAttachmentPreviewsAsync();
+
+            Assert.AreEqual(1, _viewModel.AttachmentPreviews.Count);
+            Assert.AreEqual(preview, _viewModel.AttachmentPreviews[0]);
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public async Task LoadingAttachmentPreviews_DoesNothing_IfEntryIsNotLoadedYet()
+        {
+            await _viewModel.LoadAttachmentPreviewsAsync();
+
             _entryServiceMock.VerifyNoOtherCalls();
         }
     }
