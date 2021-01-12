@@ -64,6 +64,8 @@ namespace Barembo.App.Core.ViewModels
             _currentVideoPreviewImageNumber++;
             if (_currentVideoPreviewImageNumber > 5)
                 _currentVideoPreviewImageNumber = 0;
+
+            RaisePropertyChanged(nameof(VideoPreview));
         }
 
         private void InitVideoPreviewBytes()
