@@ -50,6 +50,19 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
+        public byte[] VideoPreview1 { get { return _videoPreviewBytes[0]; } }
+        public byte[] VideoPreview2 { get { return _videoPreviewBytes[1]; } }
+        public byte[] VideoPreview3 { get { return _videoPreviewBytes[2]; } }
+        public byte[] VideoPreview4 { get { return _videoPreviewBytes[3]; } }
+        public byte[] VideoPreview5 { get { return _videoPreviewBytes[4]; } }
+        public byte[] VideoPreview6 { get { return _videoPreviewBytes[5]; } }
+        public bool ShowVideoPreview1 { get { return _currentVideoPreviewImageNumber == 0; } }
+        public bool ShowVideoPreview2 { get { return _currentVideoPreviewImageNumber == 1; } }
+        public bool ShowVideoPreview3 { get { return _currentVideoPreviewImageNumber == 2; } }
+        public bool ShowVideoPreview4 { get { return _currentVideoPreviewImageNumber == 3; } }
+        public bool ShowVideoPreview5 { get { return _currentVideoPreviewImageNumber == 4; } }
+        public bool ShowVideoPreview6 { get { return _currentVideoPreviewImageNumber == 5; } }
+
         private List<byte[]> _videoPreviewBytes;
         private int _currentVideoPreviewImageNumber;
 
@@ -66,6 +79,12 @@ namespace Barembo.App.Core.ViewModels
                 _currentVideoPreviewImageNumber = 0;
 
             RaisePropertyChanged(nameof(VideoPreview));
+            RaisePropertyChanged(nameof(ShowVideoPreview1));
+            RaisePropertyChanged(nameof(ShowVideoPreview2));
+            RaisePropertyChanged(nameof(ShowVideoPreview3));
+            RaisePropertyChanged(nameof(ShowVideoPreview4));
+            RaisePropertyChanged(nameof(ShowVideoPreview5));
+            RaisePropertyChanged(nameof(ShowVideoPreview6));
         }
 
         private void InitVideoPreviewBytes()
