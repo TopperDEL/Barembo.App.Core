@@ -50,12 +50,12 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public byte[] VideoPreview1 { get { return _videoPreviewBytes[0]; } }
-        public byte[] VideoPreview2 { get { return _videoPreviewBytes[1]; } }
-        public byte[] VideoPreview3 { get { return _videoPreviewBytes[2]; } }
-        public byte[] VideoPreview4 { get { return _videoPreviewBytes[3]; } }
-        public byte[] VideoPreview5 { get { return _videoPreviewBytes[4]; } }
-        public byte[] VideoPreview6 { get { return _videoPreviewBytes[5]; } }
+        public byte[] VideoPreview1 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[0]; else { return null; } } }
+        public byte[] VideoPreview2 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[1]; else { return null; } } }
+        public byte[] VideoPreview3 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[2]; else { return null; } } }
+        public byte[] VideoPreview4 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[3]; else { return null; } } }
+        public byte[] VideoPreview5 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[4]; else { return null; } } }
+        public byte[] VideoPreview6 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[5]; else { return null; } } }
         public bool ShowVideoPreview1 { get { return _currentVideoPreviewImageNumber == 0; } }
         public bool ShowVideoPreview2 { get { return _currentVideoPreviewImageNumber == 1; } }
         public bool ShowVideoPreview3 { get { return _currentVideoPreviewImageNumber == 2; } }
@@ -96,6 +96,13 @@ namespace Barembo.App.Core.ViewModels
                 foreach (var previewBase64 in _attachmentPreview.PreviewPartsBase64)
                     _videoPreviewBytes.Add(Convert.FromBase64String(previewBase64));
             }
+
+            RaisePropertyChanged(nameof(VideoPreview1));
+            RaisePropertyChanged(nameof(VideoPreview2));
+            RaisePropertyChanged(nameof(VideoPreview3));
+            RaisePropertyChanged(nameof(VideoPreview4));
+            RaisePropertyChanged(nameof(VideoPreview5));
+            RaisePropertyChanged(nameof(VideoPreview6));
         }
     }
 }
