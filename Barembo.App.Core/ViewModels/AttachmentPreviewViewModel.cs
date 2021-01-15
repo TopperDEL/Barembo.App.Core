@@ -24,7 +24,7 @@ namespace Barembo.App.Core.ViewModels
         {
             get
             {
-                if (_attachmentPreview.PreviewPartsBase64.Count == 1)
+                if (_attachmentPreview.PreviewPartsBase64?.Count == 1)
                 {
                     return Convert.FromBase64String(_attachmentPreview.PreviewPartsBase64[0]);
                 }
@@ -39,7 +39,7 @@ namespace Barembo.App.Core.ViewModels
         {
             get
             {
-                if (_videoPreviewBytes != null && _videoPreviewBytes.Count > _currentVideoPreviewImageNumber)
+                if (_videoPreviewBytes?.Count > _currentVideoPreviewImageNumber)
                 {
                     return _videoPreviewBytes[_currentVideoPreviewImageNumber];
                 }
@@ -50,12 +50,12 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public byte[] VideoPreview1 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[0]; else { return null; } } }
-        public byte[] VideoPreview2 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[1]; else { return null; } } }
-        public byte[] VideoPreview3 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[2]; else { return null; } } }
-        public byte[] VideoPreview4 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[3]; else { return null; } } }
-        public byte[] VideoPreview5 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[4]; else { return null; } } }
-        public byte[] VideoPreview6 { get { if (_videoPreviewBytes != null && _videoPreviewBytes.Count > 0) return _videoPreviewBytes[5]; else { return null; } } }
+        public byte[] VideoPreview1 { get { if (_videoPreviewBytes?.Count > 0) return _videoPreviewBytes[0]; else { return null; } } }
+        public byte[] VideoPreview2 { get { if (_videoPreviewBytes?.Count > 0) return _videoPreviewBytes[1]; else { return null; } } }
+        public byte[] VideoPreview3 { get { if (_videoPreviewBytes?.Count > 0) return _videoPreviewBytes[2]; else { return null; } } }
+        public byte[] VideoPreview4 { get { if (_videoPreviewBytes?.Count > 0) return _videoPreviewBytes[3]; else { return null; } } }
+        public byte[] VideoPreview5 { get { if (_videoPreviewBytes?.Count > 0) return _videoPreviewBytes[4]; else { return null; } } }
+        public byte[] VideoPreview6 { get { if (_videoPreviewBytes?.Count > 0) return _videoPreviewBytes[5]; else { return null; } } }
         public bool ShowVideoPreview1 { get { return _currentVideoPreviewImageNumber == 0; } }
         public bool ShowVideoPreview2 { get { return _currentVideoPreviewImageNumber == 1; } }
         public bool ShowVideoPreview3 { get { return _currentVideoPreviewImageNumber == 2; } }
