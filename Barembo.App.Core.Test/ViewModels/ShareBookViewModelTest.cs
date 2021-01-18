@@ -29,7 +29,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public void ExecuteSaveEntry_Publishes_Message()
+        public void ExecuteSaveEntry_Saves_EntryPublishes_Message()
         {
             BookReference bookReference = new BookReference();
             StoreAccess storeAccess = new StoreAccess();
@@ -46,7 +46,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public void ExecuteSaveEntry_Saves_Entry()
+        public void ExecuteSaveEntry_Publishes_Message()
         {
             BookReference bookReference = new BookReference();
             StoreAccess storeAccess = new StoreAccess();

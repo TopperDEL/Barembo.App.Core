@@ -63,7 +63,7 @@ namespace Barembo.App.Core.ViewModels
                 {
                     var bookShareReference = await _bookShelfService.ShareBookAsync(_storeAccess, _bookReference, _contributorName, _accessRights);
 
-                    _eventAggregator.GetEvent<BookShareSavedMessage>().Publish();
+                    _eventAggregator.GetEvent<BookShareSavedMessage>().Publish(bookShareReference);
                 }
                 catch (BookShareCouldNotBeSavedException ex)
                 {
