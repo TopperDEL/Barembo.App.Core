@@ -10,7 +10,8 @@ namespace Barembo.App.Core.Messages
         EntryCouldNotBeCreated,
         EntryCouldNotBeSavedException,
         AttachmentCouldNotBeSaved,
-        ThumbnailCouldNotBeSet
+        ThumbnailCouldNotBeSet,
+        BookShareCouldNotBeSavedException
     }
     public class ErrorMessage : PubSubEvent<Tuple<ErrorType, string>>
     {
