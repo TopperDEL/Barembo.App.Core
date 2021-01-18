@@ -29,7 +29,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public void ExecuteSaveEntry_Saves_EntryPublishes_Message()
+        public void ExecuteSaveBookShare_Saves_BookSharePublishes_Message()
         {
             BookReference bookReference = new BookReference();
             StoreAccess storeAccess = new StoreAccess();
@@ -46,7 +46,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public void ExecuteSaveEntry_Publishes_Message()
+        public void ExecuteSaveBookShare_Publishes_Message()
         {
             BookReference bookReference = new BookReference();
             StoreAccess storeAccess = new StoreAccess();
@@ -64,7 +64,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public void ExecuteSaveEntry_SetsAndClears_SaveInProgress()
+        public void ExecuteSaveBookShare_SetsAndClears_SaveInProgress()
         {
             BookReference bookReference = new BookReference();
             StoreAccess storeAccess = new StoreAccess();
@@ -86,7 +86,7 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
-        public void ExecuteSaveEntry_RaisesError_IfEntryCouldNotBeCreated()
+        public void ExecuteSaveBookShare_RaisesError_IfBookShareCouldNotBeCreated()
         {
             BookReference bookReference = new BookReference();
             StoreAccess storeAccess = new StoreAccess();
