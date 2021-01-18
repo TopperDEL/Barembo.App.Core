@@ -31,23 +31,6 @@ namespace Barembo.App.Core.Test.ViewModels
         [TestMethod]
         public void ExecuteSaveBookShare_Saves_BookSharePublishes_Message()
         {
-            BookReference bookReference = new BookReference();
-            StoreAccess storeAccess = new StoreAccess();
-            BookShareReference bookShareReference = new BookShareReference();
-            _viewModel.ContributorName = "Tim";
-            _viewModel.AccessRights.CanAddEntries = true;
-
-            _bookShelfServiceMock.Setup(s => s.ShareBookAsync(storeAccess, bookReference, _viewModel.ContributorName, _viewModel.AccessRights)).Returns(Task.FromResult(bookShareReference)).Verifiable();
-
-            _viewModel.Init(storeAccess, bookReference);
-            _viewModel.SaveBookShareCommand.Execute();
-
-            _bookShelfServiceMock.Verify();
-        }
-
-        [TestMethod]
-        public void ExecuteSaveBookShare_Publishes_Message()
-        {
             //BookReference bookReference = new BookReference();
             //StoreAccess storeAccess = new StoreAccess();
             //BookShareReference bookShareReference = new BookShareReference();
@@ -55,12 +38,29 @@ namespace Barembo.App.Core.Test.ViewModels
             //_viewModel.AccessRights.CanAddEntries = true;
 
             //_bookShelfServiceMock.Setup(s => s.ShareBookAsync(storeAccess, bookReference, _viewModel.ContributorName, _viewModel.AccessRights)).Returns(Task.FromResult(bookShareReference)).Verifiable();
-            //_eventAggregator.Setup(s => s.GetEvent<BookShareSavedMessage>()).Returns(new BookShareSavedMessage()).Verifiable();
 
             //_viewModel.Init(storeAccess, bookReference);
             //_viewModel.SaveBookShareCommand.Execute();
 
-            //_eventAggregator.Verify();
+            //_bookShelfServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public void ExecuteSaveBookShare_Publishes_Message()
+        {
+            BookReference bookReference = new BookReference();
+            StoreAccess storeAccess = new StoreAccess();
+            BookShareReference bookShareReference = new BookShareReference();
+            _viewModel.ContributorName = "Tim";
+            _viewModel.AccessRights.CanAddEntries = true;
+
+            _bookShelfServiceMock.Setup(s => s.ShareBookAsync(storeAccess, bookReference, _viewModel.ContributorName, _viewModel.AccessRights)).Returns(Task.FromResult(bookShareReference)).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<BookShareSavedMessage>()).Returns(new BookShareSavedMessage()).Verifiable();
+
+            _viewModel.Init(storeAccess, bookReference);
+            _viewModel.SaveBookShareCommand.Execute();
+
+            _eventAggregator.Verify();
         }
 
         [TestMethod]
