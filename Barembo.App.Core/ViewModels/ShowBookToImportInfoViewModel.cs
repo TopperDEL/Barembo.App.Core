@@ -56,7 +56,7 @@ namespace Barembo.App.Core.ViewModels
 
                 if (imported)
                 {
-                    _eventAggregator.GetEvent<BookImportedMessage>().Publish();
+                    _eventAggregator.GetEvent<BookImportedMessage>().Publish(_storeAccess);
                 }
                 else
                 {
