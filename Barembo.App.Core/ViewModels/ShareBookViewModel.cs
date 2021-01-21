@@ -27,6 +27,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _contributorName, value); }
         }
 
+        private string _bookName;
+        public string BookName
+        {
+            get { return _bookName; }
+            set { SetProperty(ref _bookName, value); }
+        }
+
         private AccessRights _accessRights;
         public AccessRights AccessRights
         {
@@ -61,7 +68,7 @@ namespace Barembo.App.Core.ViewModels
             {
                 try
                 {
-                    var bookShareReference = await _bookShelfService.ShareBookAsync(_storeAccess, _bookReference, _contributorName, _accessRights);
+                    var bookShareReference = await _bookShelfService.ShareBookAsync(_storeAccess, _bookReference, _contributorName, _accessRights, BookName);
 
                     _eventAggregator.GetEvent<BookShareSavedMessage>().Publish(bookShareReference);
                 }
