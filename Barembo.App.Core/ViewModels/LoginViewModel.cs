@@ -66,6 +66,17 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
+        private string _accessGrant;
+        public string AccessGrant
+        {
+            get { return _accessGrant; }
+            set
+            {
+                SetProperty(ref _accessGrant, value);
+                LoginCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         private bool _loginFailed;
         public bool LoginFailed
         {
@@ -97,6 +108,7 @@ namespace Barembo.App.Core.ViewModels
             loginData.ApiKey = ApiKey;
             loginData.SatelliteAddress = SatelliteAddress;
             loginData.Secret = Secret;
+            loginData.AccessGrant = AccessGrant;
 
             StoreAccess storeAccess;
             try
@@ -122,6 +134,9 @@ namespace Barembo.App.Core.ViewModels
         bool CanExecuteLoginCommand()
         {
             SecretsDoNotMatch = false;
+
+            if (!string.IsNullOrEmpty(AccessGrant))
+                return true;
 
             if (string.IsNullOrEmpty(SatelliteAddress))
                 return false;

@@ -40,6 +40,14 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public void Login_IsPossible_IfAccessGrantIsProvided()
+        {
+            _viewModel.AccessGrant = "myAccessGrant";
+            
+            Assert.IsTrue(_viewModel.LoginCommand.CanExecute());
+        }
+
+        [TestMethod]
         public void Login_IsNotPossible_IfSatelliteAddressIsEmpty()
         {
             _viewModel.Secret = "mySecret";
@@ -193,7 +201,6 @@ namespace Barembo.App.Core.Test.ViewModels
             _viewModel.Secret = "mySecret";
             _viewModel.SecretVerify = "mySecretVerify";
             _viewModel.ApiKey = "apiKey";
-            StoreAccess access = new StoreAccess("myAccess");
 
             _storeAccessServiceMock.Setup(s => s.GenerateAccessFromLogin(Moq.It.Is<LoginData>(l => l.ApiKey == _viewModel.ApiKey &&
                                                                                                   l.SatelliteAddress == _viewModel.SatelliteAddress &&
