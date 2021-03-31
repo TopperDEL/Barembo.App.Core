@@ -20,7 +20,7 @@ namespace Barembo.App.Core.ViewModels
         private readonly SynchronizationContext _synchronizationContext;
         private Entry _entry;
         public event EntryLoadedDelegate EntryLoaded;
-        private object _loadingLock = new object();
+        private readonly object _loadingLock = new object();
 
         public string Header
         {
