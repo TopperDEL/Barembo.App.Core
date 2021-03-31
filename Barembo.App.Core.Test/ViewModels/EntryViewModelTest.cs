@@ -83,6 +83,23 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public async Task LoadEntryAsync_LoadsEntry()
+        {
+            Entry entry = new Entry();
+            entry.Header = "Header";
+            entry.Body = "Body";
+
+            _entryServiceMock.Setup(s => s.LoadEntryAsync(_entryReference)).Returns(Task.FromResult(entry)).Verifiable();
+            _syncConMock.Setup(s => s.Post(Moq.It.IsAny<System.Threading.SendOrPostCallback>(), null)).Callback(() => { _viewModel.InitFromEntry(entry);  });
+
+            await _viewModel.LoadEntryAsync();
+
+            Assert.IsFalse(_viewModel.IsLoading);
+            _entryServiceMock.Verify();
+            _syncConMock.Verify();
+        }
+
+        [TestMethod]
         public async Task LoadingAttachmentPreviews_Loads_AllPreviews()
         {
             Attachment attachment = new Attachment();

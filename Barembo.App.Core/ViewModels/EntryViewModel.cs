@@ -20,6 +20,7 @@ namespace Barembo.App.Core.ViewModels
         private readonly SynchronizationContext _synchronizationContext;
         private Entry _entry;
         public event EntryLoadedDelegate EntryLoaded;
+        private object _loadingLock = new object();
 
         public string Header
         {
@@ -27,7 +28,7 @@ namespace Barembo.App.Core.ViewModels
             {
                 if (_entry == null)
                 {
-                    LoadEntry();
+                    LoadEntryInBackground();
                     return "...";
                 }
                 return _entry.Header;
@@ -40,7 +41,7 @@ namespace Barembo.App.Core.ViewModels
             {
                 if (_entry == null)
                 {
-                    LoadEntry();
+                    LoadEntryInBackground();
                     return "...";
                 }
                 return _entry.Body;
@@ -53,7 +54,7 @@ namespace Barembo.App.Core.ViewModels
             {
                 if (_entry == null)
                 {
-                    LoadEntry();
+                    LoadEntryInBackground();
                     return null;
                 }
                 else if (string.IsNullOrEmpty(_entry.ThumbnailBase64))
@@ -73,21 +74,41 @@ namespace Barembo.App.Core.ViewModels
             AttachmentPreviews = new ObservableCollection<AttachmentPreviewViewModel>();
         }
 
-        private void LoadEntry()
+        public void LoadEntryInBackground()
         {
-            if (IsLoading)
-                return;
+            lock (_loadingLock)
+            {
+                if (IsLoading)
+                    return;
 
-            IsLoading = true;
+                IsLoading = true;
 
-            _entryService.LoadEntryAsSoonAsPossible(
-                _entryReference, //The entry to load
-                (loadedEntry) =>
-                    _synchronizationContext.Post((o) =>
-                    {
-                        InitFromEntry(loadedEntry);
-                    }, null), //If the entry got loaded, Refresh the values on the UI-Thread
-                () => IsLoading = false); //If the entry failed to load, reset the IsLoading to start a new attempt
+                _entryService.LoadEntryAsSoonAsPossible(
+                    _entryReference, //The entry to load
+                    (loadedEntry) =>
+                        _synchronizationContext.Post((o) =>
+                        {
+                            InitFromEntry(loadedEntry);
+                        }, null), //If the entry got loaded, Refresh the values on the UI-Thread
+                    () => IsLoading = false); //If the entry failed to load, reset the IsLoading to start a new attempt
+            }
+        }
+
+        public async Task LoadEntryAsync()
+        {
+            lock (_loadingLock)
+            {
+                if (IsLoading)
+                    return;
+
+                IsLoading = true;
+            }
+
+            var entry = await _entryService.LoadEntryAsync(_entryReference);
+            _synchronizationContext.Post((o) =>
+            {
+                InitFromEntry(entry);
+            }, null);
         }
 
         public async Task LoadAttachmentPreviewsAsync()
