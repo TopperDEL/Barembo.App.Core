@@ -64,6 +64,14 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
+        public DateTime CreationDate
+        {
+            get
+            {
+                return _entryReference.CreationDate;
+            }
+        }
+
         public ObservableCollection<AttachmentPreviewViewModel> AttachmentPreviews { get; set; }
 
         public EntryViewModel(EntryReference entryReference, IEntryService entryService, SynchronizationContext synchronizationContext)
