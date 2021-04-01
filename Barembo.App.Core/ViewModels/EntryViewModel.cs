@@ -117,8 +117,15 @@ namespace Barembo.App.Core.ViewModels
             {
                 foreach (var attachment in _entry.Attachments)
                 {
-                    var preview = await _entryService.LoadAttachmentPreviewAsync(_entryReference, attachment);
-                    AttachmentPreviews.Add(new AttachmentPreviewViewModel(preview));
+                    try
+                    {
+                        var preview = await _entryService.LoadAttachmentPreviewAsync(_entryReference, attachment);
+                        AttachmentPreviews.Add(new AttachmentPreviewViewModel(preview));
+                    }
+                    catch(Barembo.Exceptions.AttachmentPreviewNotExistsException)
+                    {
+                        //Ignore
+                    }
                 }
             }
         }
