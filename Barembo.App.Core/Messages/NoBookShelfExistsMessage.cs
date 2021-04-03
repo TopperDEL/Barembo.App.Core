@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Barembo.App.Core.Messages
 {
-    public class NoBookShelfExistsMessage : PubSubEvent<StoreAccess>
+    public class NoBookShelfExistsMessage : PubSubEvent<Tuple<StoreAccess,string>>
     {
     }
 }

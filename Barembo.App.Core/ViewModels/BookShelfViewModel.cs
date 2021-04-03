@@ -76,9 +76,9 @@ namespace Barembo.App.Core.ViewModels
                     Books.Add(bookVM);
                 }
             }
-            catch(NoBookShelfExistsException)
+            catch(NoBookShelfExistsException ex)
             {
-                _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(storeAccess);
+                _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(storeAccess, ex.Message));
             }
         }
     }
