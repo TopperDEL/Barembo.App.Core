@@ -41,7 +41,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteAddOwnBookCommand()
         {
-            _eventAggregator.GetEvent<AddOwnBookMessage>().Publish(new Tuple<StoreAccess,BookShelf>(_storeAccess, _bookShelf));
+            _eventAggregator.GetEvent<AddOwnBookMessage>().Publish(new Tuple<StoreAccess, BookShelf>(_storeAccess, _bookShelf));
         }
 
         private DelegateCommand _addForeignBookCommand;
@@ -70,15 +70,15 @@ namespace Barembo.App.Core.ViewModels
             {
                 BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
 
-                foreach(var bookReference in BookShelf.Content)
+                foreach (var bookReference in BookShelf.Content)
                 {
                     var bookVM = await BookViewModel.CreateAsync(_bookService, _eventAggregator, bookReference);
                     Books.Add(bookVM);
                 }
             }
-            catch(NoBookShelfExistsException ex)
+            catch (NoBookShelfExistsException ex)
             {
-                _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(storeAccess, ex.Message));
+                _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(storeAccess, ex.Message + " - " + ex.AccessGrant + " - " + ex.AdditionalError + " - " + ex.StoreKey));
             }
         }
     }

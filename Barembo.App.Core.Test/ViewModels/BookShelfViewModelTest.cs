@@ -37,7 +37,7 @@ namespace Barembo.App.Core.Test.ViewModels
         {
             NoBookShelfExistsMessage msg = new NoBookShelfExistsMessage();
 
-            _bookShelfServiceMock.Setup(s => s.LoadBookShelfAsync(_storeAccess)).Throws(new NoBookShelfExistsException()).Verifiable();
+            _bookShelfServiceMock.Setup(s => s.LoadBookShelfAsync(_storeAccess)).Throws(new NoBookShelfExistsException("","","")).Verifiable();
             _eventAggregator.Setup(s => s.GetEvent<NoBookShelfExistsMessage>()).Returns(msg).Verifiable();
 
             await _viewModel.InitAsync(_storeAccess);
