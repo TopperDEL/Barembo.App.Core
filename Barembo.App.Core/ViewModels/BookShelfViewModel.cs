@@ -64,11 +64,21 @@ namespace Barembo.App.Core.ViewModels
 
         public async Task InitAsync(StoreAccess storeAccess)
         {
+            int tryCount = 0;
             Books.Clear();
             _storeAccess = storeAccess;
             try
             {
-                BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
+                try
+                {
+                    tryCount++;
+                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
+                }catch(Exception ex)
+                {
+                    tryCount++;
+                    await Task.Delay(1000);
+                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
+                }
 
                 foreach (var bookReference in BookShelf.Content)
                 {
@@ -78,7 +88,7 @@ namespace Barembo.App.Core.ViewModels
             }
             catch (NoBookShelfExistsException ex)
             {
-                _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(storeAccess, ex.Message + " - " + ex.AccessGrant + " - " + ex.AdditionalError + " - " + ex.StoreKey));
+                _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(storeAccess, ex.Message + " - " + ex.AccessGrant + " - " + ex.AdditionalError + " - " + ex.StoreKey + " - " + tryCount.ToString() + " - " + ex.StackTrace));
             }
         }
     }
