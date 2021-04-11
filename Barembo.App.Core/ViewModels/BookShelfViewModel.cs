@@ -76,7 +76,7 @@ namespace Barembo.App.Core.ViewModels
                 }catch(Exception ex)
                 {
                     tryCount++;
-                    await Task.Delay(1000);
+                    await Task.Delay(1000).ConfigureAwait(false);
                     BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
                 }
 
