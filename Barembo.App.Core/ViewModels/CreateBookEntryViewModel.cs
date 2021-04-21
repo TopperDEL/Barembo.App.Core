@@ -87,9 +87,13 @@ namespace Barembo.App.Core.ViewModels
                 {
                     var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, entry);
 
+                    _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.EntrySaved, new Dictionary<string, string>() { { "EntryID", entry.Id } }));
+
                     bool setAsThumbnail = true;
                     foreach (var attachment in Attachments)
                     {
+                        _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.SavingAttachment, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
+
                         var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
                         if (!attachmentAdded)
                         {
@@ -106,6 +110,8 @@ namespace Barembo.App.Core.ViewModels
                             }
                         }
                         setAsThumbnail = false;
+
+                        _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.AttachmentSaved, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
                     }
 
                     _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, entry));
