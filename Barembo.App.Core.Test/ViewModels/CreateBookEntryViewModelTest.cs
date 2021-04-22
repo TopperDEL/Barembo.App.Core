@@ -28,6 +28,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock = new Moq.Mock<IEntryService>();
             _thumbnailGeneratorService = new Moq.Mock<IThumbnailGeneratorService>();
             _eventAggregator.Setup(s => s.GetEvent<MediaReceivedMessage>()).Returns(new MediaReceivedMessage());
+            _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage());
             _viewModel = new CreateBookEntryViewModel(_entryServiceMock.Object, _eventAggregator.Object, _thumbnailGeneratorService.Object);
         }
 
