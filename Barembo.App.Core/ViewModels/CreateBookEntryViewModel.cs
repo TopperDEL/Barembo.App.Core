@@ -50,6 +50,13 @@ namespace Barembo.App.Core.ViewModels
             private set { SetProperty(ref _attachments, value); }
         }
 
+        private ObservableCollection<string> _infoMessages;
+        public ObservableCollection<string> InfoMessages
+        {
+            get { return _infoMessages; }
+            private set { SetProperty(ref _infoMessages, value); }
+        }
+
         private DelegateCommand _saveEntryCommand;
         public DelegateCommand SaveEntryCommand =>
             _saveEntryCommand ?? (_saveEntryCommand = new DelegateCommand(async () => await ExecuteSaveEntryCommand().ConfigureAwait(false), CanExecuteSaveEntryCommand));
@@ -148,8 +155,20 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator = eventAggregator;
             _thumbnailGeneratorService = thumbnailGeneratorService;
             _eventAggregator.GetEvent<MediaReceivedMessage>().Subscribe(HandleMediaReceived);
+            _eventAggregator.GetEvent<InAppInfoMessage>().Subscribe(HandleInAppInfoMessageReceived);
 
             Attachments = new ObservableCollection<MediaDataViewModel>();
+            InfoMessages = new ObservableCollection<string>();
+        }
+
+        private void HandleInAppInfoMessageReceived(Tuple<InAppInfoMessageType, Dictionary<string, string>> data)
+        {
+            if (data.Item1 == InAppInfoMessageType.EntrySaved)
+                InfoMessages.Add("Entry saved"); //ToDo
+            else if (data.Item1 == InAppInfoMessageType.SavingAttachment)
+                InfoMessages.Add("Saving attachment - " + data.Item2["AttachmentName"]); //ToDo
+            else if (data.Item1 == InAppInfoMessageType.AttachmentSaved)
+                InfoMessages.Add("Attachment saved - " + data.Item2["AttachmentName"]); //ToDo
         }
 
         public void Init(BookReference bookReference)
