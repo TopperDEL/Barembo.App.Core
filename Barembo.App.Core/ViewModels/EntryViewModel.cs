@@ -84,25 +84,23 @@ namespace Barembo.App.Core.ViewModels
 
         public void LoadEntryInBackground()
         {
-            Task.Run(() =>
+
+            lock (_loadingLock)
             {
-                lock (_loadingLock)
-                {
-                    if (IsLoading)
-                        return;
+                if (IsLoading)
+                    return;
 
-                    IsLoading = true;
+                IsLoading = true;
 
-                    _entryService.LoadEntryAsSoonAsPossible(
-                        _entryReference, //The entry to load
-                        (loadedEntry) =>
-                            _synchronizationContext.Post((o) =>
-                            {
-                                InitFromEntry(loadedEntry);
-                            }, null), //If the entry got loaded, Refresh the values on the UI-Thread
-                        () => IsLoading = false); //If the entry failed to load, reset the IsLoading to start a new attempt
-                }
-            });
+                _entryService.LoadEntryAsSoonAsPossible(
+                    _entryReference, //The entry to load
+                    (loadedEntry) =>
+                        _synchronizationContext.Post((o) =>
+                        {
+                            InitFromEntry(loadedEntry);
+                        }, null), //If the entry got loaded, Refresh the values on the UI-Thread
+                    () => IsLoading = false); //If the entry failed to load, reset the IsLoading to start a new attempt
+            }
         }
 
         public async Task LoadEntryAsync()
@@ -133,7 +131,7 @@ namespace Barembo.App.Core.ViewModels
                         var preview = await _entryService.LoadAttachmentPreviewAsync(_entryReference, attachment);
                         AttachmentPreviews.Add(new AttachmentPreviewViewModel(preview));
                     }
-                    catch(Barembo.Exceptions.AttachmentPreviewNotExistsException)
+                    catch (Barembo.Exceptions.AttachmentPreviewNotExistsException)
                     {
                         //Ignore
                     }
