@@ -78,13 +78,17 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<GoBackMessage>().Publish();
         }
 
+        private Entry _entry;
         async Task ExecuteSaveEntryCommand()
         {
             SaveInProgress = true;
             try
             {
-                var entry = _entryService.CreateEntry(Header, Body);
-                if (entry == null)
+                if (_entry == null)
+                {
+                    _entry = _entryService.CreateEntry(Header, Body);
+                }
+                if (_entry == null)
                 {
                     _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeCreated, ""));
                     return;
@@ -92,16 +96,16 @@ namespace Barembo.App.Core.ViewModels
 
                 try
                 {
-                    var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, entry);
+                    var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, _entry);
 
-                    _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.EntrySaved, new Dictionary<string, string>() { { "EntryID", entry.Id } }));
+                    _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.EntrySaved, new Dictionary<string, string>() { { "EntryID", _entry.Id } }));
 
                     bool setAsThumbnail = true;
                     foreach (var attachment in Attachments)
                     {
                         _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.SavingAttachment, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
 
-                        var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
+                        var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, _entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
                         if (!attachmentAdded)
                         {
                             _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.MediaData.Attachment.FileName));
@@ -109,7 +113,7 @@ namespace Barembo.App.Core.ViewModels
                         }
                         if (setAsThumbnail)
                         {
-                            var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
+                            var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, _entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
                             if (!thumbnailSet)
                             {
                                 _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.MediaData.Attachment.FileName));
@@ -121,7 +125,7 @@ namespace Barembo.App.Core.ViewModels
                         _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.AttachmentSaved, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
                     }
 
-                    _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, entry));
+                    _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, _entry));
                 }
                 catch (EntryCouldNotBeSavedException ex)
                 {
