@@ -1,6 +1,6 @@
 # Barembo.App.Core
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2c7b16e7aefa47f6a0e45de32c9816c5)](https://www.codacy.com/gh/TopperDEL/Barembo.App.Core/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TopperDEL/Barembo.App.Core&amp;utm_campaign=Badge_Grade) [![NuGet Downloads](https://img.shields.io/nuget/dt/Barembo.App.Core)](https://www.nuget.org/packages/Barembo.App.Core) ![Publish](https://github.com/TopperDEL/Barembo.App.Core/workflows/Publish/badge.svg) [![Storj.io](https://storj.io/img/storj-badge.svg)](https://storj.io)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/2c7b16e7aefa47f6a0e45de32c9816c5)](https://www.codacy.com/gh/TopperDEL/Barembo.App.Core/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TopperDEL/Barembo.App.Core&amp;utm_campaign=Badge_Grade) [![NuGet Downloads](https://img.shields.io/nuget/dt/Barembo.App.Core)](https://www.nuget.org/packages/Barembo.App.Core) ![Publish](https://github.com/TopperDEL/Barembo.App.Core/workflows/Publish/badge.svg) [![Storj.io](https://github.com/storj/storj/raw/main/resources/logo.png)](https://storj.io)
 
 ## The App-Core to Barembo
 
