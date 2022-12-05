@@ -9,6 +9,7 @@ namespace Barembo.App.Core.Messages
     {
         EntryCouldNotBeCreated,
         EntryCouldNotBeSavedException,
+        NoTargetBookSelected,
         AttachmentCouldNotBeSaved,
         ThumbnailCouldNotBeSet,
         BookShareCouldNotBeSavedException,

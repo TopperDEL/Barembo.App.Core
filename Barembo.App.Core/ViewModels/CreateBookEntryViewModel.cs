@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,6 +58,13 @@ namespace Barembo.App.Core.ViewModels
             private set { SetProperty(ref _infoMessages, value); }
         }
 
+        private ObservableCollection<(bool Selected, BookReference BookReference)> _bookReferences;
+        public ObservableCollection<(bool Selected, BookReference BookReference)> BookReferences
+        {
+            get { return _bookReferences; }
+            private set { SetProperty(ref _bookReferences, value); }
+        }
+
         private DelegateCommand _saveEntryCommand;
         public DelegateCommand SaveEntryCommand =>
             _saveEntryCommand ?? (_saveEntryCommand = new DelegateCommand(async () => await ExecuteSaveEntryCommand().ConfigureAwait(false), CanExecuteSaveEntryCommand));
@@ -81,6 +89,12 @@ namespace Barembo.App.Core.ViewModels
         private Entry _entry;
         async Task ExecuteSaveEntryCommand()
         {
+            if(BookReferences.Where(s=>s.Selected).Count() == 0)
+            {
+                _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.NoTargetBookSelected, ""));
+                return;
+            }
+
             SaveInProgress = true;
             try
             {
@@ -94,42 +108,45 @@ namespace Barembo.App.Core.ViewModels
                     return;
                 }
 
-                try
+                foreach (var bookReference in BookReferences.Where(s => s.Selected))
                 {
-                    var entryReference = await _entryService.AddEntryToBookAsync(_bookReference, _entry);
-
-                    _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.EntrySaved, new Dictionary<string, string>() { { "EntryID", _entry.Id } }));
-
-                    bool setAsThumbnail = true;
-                    foreach (var attachment in Attachments)
+                    try
                     {
-                        _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.SavingAttachment, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
+                        var entryReference = await _entryService.AddEntryToBookAsync(bookReference.BookReference, _entry);
 
-                        var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, _entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
-                        if (!attachmentAdded)
+                        _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.EntrySaved, new Dictionary<string, string>() { { "EntryID", _entry.Id } }));
+
+                        bool setAsThumbnail = true;
+                        foreach (var attachment in Attachments)
                         {
-                            _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.MediaData.Attachment.FileName));
-                            return;
-                        }
-                        if (setAsThumbnail)
-                        {
-                            var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, _entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
-                            if (!thumbnailSet)
+                            _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.SavingAttachment, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
+
+                            var attachmentAdded = await _entryService.AddAttachmentAsync(entryReference, _entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
+                            if (!attachmentAdded)
                             {
-                                _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.MediaData.Attachment.FileName));
+                                _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.AttachmentCouldNotBeSaved, attachment.MediaData.Attachment.FileName));
                                 return;
                             }
+                            if (setAsThumbnail)
+                            {
+                                var thumbnailSet = await _entryService.SetThumbnailAsync(entryReference, _entry, attachment.MediaData.Attachment, attachment.MediaData.Stream, attachment.MediaData.FilePath);
+                                if (!thumbnailSet)
+                                {
+                                    _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.ThumbnailCouldNotBeSet, attachment.MediaData.Attachment.FileName));
+                                    return;
+                                }
+                            }
+                            setAsThumbnail = false;
+
+                            _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.AttachmentSaved, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
                         }
-                        setAsThumbnail = false;
 
-                        _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.AttachmentSaved, new Dictionary<string, string>() { { "AttachmentName", attachment.MediaData.Attachment.FileName } }));
+                        _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, _entry));
                     }
-
-                    _eventAggregator.GetEvent<BookEntrySavedMessage>().Publish(new Tuple<EntryReference, Entry>(entryReference, _entry));
-                }
-                catch (EntryCouldNotBeSavedException ex)
-                {
-                    _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeSavedException, ex.Message));
+                    catch (EntryCouldNotBeSavedException ex)
+                    {
+                        _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.EntryCouldNotBeSavedException, ex.Message));
+                    }
                 }
             }
             finally
@@ -161,6 +178,8 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<MediaReceivedMessage>().Subscribe(HandleMediaReceived);
             _eventAggregator.GetEvent<InAppInfoMessage>().Subscribe(HandleInAppInfoMessageReceived);
 
+            BookReferences = new ObservableCollection<(bool Selected, BookReference BookReference)>();
+
             Attachments = new ObservableCollection<MediaDataViewModel>();
             InfoMessages = new ObservableCollection<string>();
         }
@@ -175,9 +194,26 @@ namespace Barembo.App.Core.ViewModels
                 InfoMessages.Add("Attachment saved - " + data.Item2["AttachmentName"]); //ToDo
         }
 
-        public void Init(BookReference bookReference)
+        public void Init(BookReference bookReference, BookShelf bookShelf)
         {
-            _bookReference = bookReference;
+            _bookReference = bookReference; //ToDo: weg damit
+
+            foreach(var reference in bookShelf.Content)
+            {
+                BookReferences.Add((bookReference.BookId == reference.BookId, reference));
+            }
+        }
+
+        internal void Select(BookReference bookReference)
+        {
+            foreach(var entry in BookReferences.ToList())
+            {
+                if(entry.BookReference.BookId == bookReference.BookId)
+                {
+                    BookReferences.Remove(entry);
+                    BookReferences.Add((true, bookReference));
+                }
+            }
         }
 
         internal void HandleMediaReceived(MediaData mediaData)

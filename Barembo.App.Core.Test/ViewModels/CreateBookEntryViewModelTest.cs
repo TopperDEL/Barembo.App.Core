@@ -20,6 +20,7 @@ namespace Barembo.App.Core.Test.ViewModels
         Moq.Mock<IEntryService> _entryServiceMock;
         Moq.Mock<IEventAggregator> _eventAggregator;
         Moq.Mock<IThumbnailGeneratorService> _thumbnailGeneratorService;
+        BookShelf _bookShelf;
 
         [TestInitialize]
         public void Init()
@@ -27,6 +28,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _eventAggregator = new Moq.Mock<IEventAggregator>();
             _entryServiceMock = new Moq.Mock<IEntryService>();
             _thumbnailGeneratorService = new Moq.Mock<IThumbnailGeneratorService>();
+            _bookShelf = new BookShelf();
             _eventAggregator.Setup(s => s.GetEvent<MediaReceivedMessage>()).Returns(new MediaReceivedMessage());
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage());
             _viewModel = new CreateBookEntryViewModel(_entryServiceMock.Object, _eventAggregator.Object, _thumbnailGeneratorService.Object);
@@ -36,13 +38,14 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Publishes_Message()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             Entry entry = new Entry();
 
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage()).Verifiable();
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -52,6 +55,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Saves_Entry()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -63,7 +67,37 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
+            _viewModel.SaveEntryCommand.Execute();
+
+            _eventAggregator.Verify();
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public void ExecuteSaveEntry_Saves_EntryForMultipleBooks()
+        {
+            BookReference bookReference1 = new BookReference { BookId = "First book" };
+            _bookShelf.Content.Add(bookReference1);
+            BookReference bookReference2 = new BookReference { BookId = "Second book" };
+            _bookShelf.Content.Add(bookReference2);
+            BookReference bookReference3 = new BookReference { BookId = "Third book" };
+            _bookShelf.Content.Add(bookReference3);
+            EntryReference entryRef1 = new EntryReference();
+            EntryReference entryRef2 = new EntryReference();
+            Entry entry = new Entry();
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+
+            _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage()).Verifiable();
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
+            _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference1, entry)).Returns(Task.FromResult(entryRef1)).Verifiable();
+            _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference2, entry)).Returns(Task.FromResult(entryRef2)).Verifiable();
+
+            _viewModel.Init(bookReference1, _bookShelf);
+            _viewModel.Select(bookReference2);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -74,6 +108,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_InformsUser_AboutSavedEntry()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -85,7 +120,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -96,6 +131,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_SetsAndClears_SaveInProgress()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -107,7 +143,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             Assert.IsFalse(_viewModel.SaveInProgress);
             _viewModel.SaveEntryCommand.Execute();
             Assert.IsFalse(_viewModel.SaveInProgress);
@@ -120,6 +156,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Saves_Attachments()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -140,7 +177,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -151,6 +188,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Saves_AttachmentsWithSecondOneNotSettingThumbnail()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -179,7 +217,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment2, attachmentBinary2, "pathToFile2")).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -190,6 +228,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfEntryCouldNotBeCreated()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             Entry entry = null;
 
             _viewModel.Header = "header";
@@ -198,7 +237,25 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
+            _viewModel.SaveEntryCommand.Execute();
+
+            _eventAggregator.Verify();
+            _entryServiceMock.Verify();
+        }
+
+        [TestMethod]
+        public void ExecuteSaveEntry_RaisesError_IfNoBookReferenceIsSelected()
+        {
+            BookReference bookReference = new BookReference();
+            Entry entry = null;
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+
+            _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
+
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -209,6 +266,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfEntryCouldNotBeAddedToBook()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             Entry entry = new Entry();
 
             _viewModel.Header = "header";
@@ -218,7 +276,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Throws(new EntryCouldNotBeSavedException()).Verifiable();
             _eventAggregator.Setup(s => s.GetEvent<ErrorMessage>()).Returns(new ErrorMessage()).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -229,6 +287,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfAttachmentCouldNotBeSaved()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -248,7 +307,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(false)).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
@@ -259,6 +318,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfThumbnailCouldNotBeSet()
         {
             BookReference bookReference = new BookReference();
+            _bookShelf.Content.Add(bookReference);
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -279,7 +339,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(false)).Verifiable();
 
-            _viewModel.Init(bookReference);
+            _viewModel.Init(bookReference, _bookShelf);
             _viewModel.SaveEntryCommand.Execute();
 
             _eventAggregator.Verify();
