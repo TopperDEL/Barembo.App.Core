@@ -82,7 +82,7 @@ namespace Barembo.App.Core.ViewModels
 
                 foreach (var bookReference in BookShelf.Content)
                 {
-                    var bookVM = await BookViewModel.CreateAsync(_bookService, _bookShelf, _eventAggregator, bookReference);
+                    var bookVM = await BookViewModel.CreateAsync(_bookService, this, _eventAggregator, bookReference);
                     Books.Add(bookVM);
                 }
             }

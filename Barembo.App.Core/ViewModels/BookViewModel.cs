@@ -16,7 +16,7 @@ namespace Barembo.App.Core.ViewModels
         readonly IBookService _bookService;
         readonly IEventAggregator _eventAggregator;
         BookReference _bookReference;
-        BookShelf _bookShelf;
+        BookShelfViewModel _bookShelfViewModel;
 
         private Book book;
         public Book Book
@@ -31,7 +31,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteCreateEntryCommand()
         {
-            _eventAggregator.GetEvent<CreateBookEntryMessage>().Publish(new Tuple<BookReference, BookShelf>(_bookReference, _bookShelf));
+            _eventAggregator.GetEvent<CreateBookEntryMessage>().Publish(new Tuple<BookReference, BookShelfViewModel>(_bookReference, _bookShelfViewModel));
         }
 
         private DelegateCommand _shareBookCommand;
@@ -52,16 +52,16 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(_bookReference);
         }
 
-        internal BookViewModel(IBookService bookService, BookShelf bookShelf, IEventAggregator eventAggregator)
+        internal BookViewModel(IBookService bookService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator)
         {
             _bookService = bookService;
-            _bookShelf = bookShelf;
+            _bookShelfViewModel = bookShelfViewModel;
             _eventAggregator = eventAggregator;
         }
 
-        public static async Task<BookViewModel> CreateAsync(IBookService bookService, BookShelf bookShelf, IEventAggregator eventAggregator, BookReference bookReference)
+        public static async Task<BookViewModel> CreateAsync(IBookService bookService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator, BookReference bookReference)
         {
-            var bookVM = new BookViewModel(bookService, bookShelf, eventAggregator);
+            var bookVM = new BookViewModel(bookService, bookShelfViewModel, eventAggregator);
             await bookVM.InitAsync(bookReference).ConfigureAwait(false);
 
             return bookVM;
