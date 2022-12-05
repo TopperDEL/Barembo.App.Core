@@ -21,8 +21,6 @@ namespace Barembo.App.Core.ViewModels
         readonly IEventAggregator _eventAggregator;
         readonly IThumbnailGeneratorService _thumbnailGeneratorService;
 
-        private BookReference _bookReference;
-
         private string _header;
         public string Header
         {
@@ -196,8 +194,6 @@ namespace Barembo.App.Core.ViewModels
 
         public void Init(BookReference bookReference, BookShelfViewModel bookShelfViewModel)
         {
-            _bookReference = bookReference; //ToDo: weg damit
-
             foreach(var book in bookShelfViewModel.Books)
             {
                 Books.Add((bookReference.BookId == book.BookReference.BookId, book));
