@@ -58,11 +58,11 @@ namespace Barembo.App.Core.ViewModels
             private set { SetProperty(ref _infoMessages, value); }
         }
 
-        private ObservableCollection<(bool Selected, BookReference BookReference)> _bookReferences;
-        public ObservableCollection<(bool Selected, BookReference BookReference)> BookReferences
+        private ObservableCollection<(bool Selected, BookViewModel BookViewModel)> _books;
+        public ObservableCollection<(bool Selected, BookViewModel BookViewModel)> Books
         {
-            get { return _bookReferences; }
-            private set { SetProperty(ref _bookReferences, value); }
+            get { return _books; }
+            private set { SetProperty(ref _books, value); }
         }
 
         private DelegateCommand _saveEntryCommand;
@@ -89,7 +89,7 @@ namespace Barembo.App.Core.ViewModels
         private Entry _entry;
         async Task ExecuteSaveEntryCommand()
         {
-            if(BookReferences.Where(s=>s.Selected).Count() == 0)
+            if(Books.Where(s=>s.Selected).Count() == 0)
             {
                 _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.NoTargetBookSelected, ""));
                 return;
@@ -108,11 +108,11 @@ namespace Barembo.App.Core.ViewModels
                     return;
                 }
 
-                foreach (var bookReference in BookReferences.Where(s => s.Selected))
+                foreach (var book in Books.Where(s => s.Selected))
                 {
                     try
                     {
-                        var entryReference = await _entryService.AddEntryToBookAsync(bookReference.BookReference, _entry);
+                        var entryReference = await _entryService.AddEntryToBookAsync(book.BookViewModel.BookReference, _entry);
 
                         _eventAggregator.GetEvent<InAppInfoMessage>().Publish(new Tuple<InAppInfoMessageType, Dictionary<string, string>>(InAppInfoMessageType.EntrySaved, new Dictionary<string, string>() { { "EntryID", _entry.Id } }));
 
@@ -178,7 +178,7 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<MediaReceivedMessage>().Subscribe(HandleMediaReceived);
             _eventAggregator.GetEvent<InAppInfoMessage>().Subscribe(HandleInAppInfoMessageReceived);
 
-            BookReferences = new ObservableCollection<(bool Selected, BookReference BookReference)>();
+            Books = new ObservableCollection<(bool Selected, BookViewModel BookViewModel)>();
 
             Attachments = new ObservableCollection<MediaDataViewModel>();
             InfoMessages = new ObservableCollection<string>();
@@ -194,24 +194,24 @@ namespace Barembo.App.Core.ViewModels
                 InfoMessages.Add("Attachment saved - " + data.Item2["AttachmentName"]); //ToDo
         }
 
-        public void Init(BookReference bookReference, BookShelf bookShelf)
+        public void Init(BookReference bookReference, BookShelfViewModel bookShelfViewModel)
         {
             _bookReference = bookReference; //ToDo: weg damit
 
-            foreach(var reference in bookShelf.Content)
+            foreach(var book in bookShelfViewModel.Books)
             {
-                BookReferences.Add((bookReference.BookId == reference.BookId, reference));
+                Books.Add((bookReference.BookId == book.BookReference.BookId, book));
             }
         }
 
         internal void Select(BookReference bookReference)
         {
-            foreach(var entry in BookReferences.ToList())
+            foreach(var entry in Books.ToList())
             {
-                if(entry.BookReference.BookId == bookReference.BookId)
+                if(entry.BookViewModel.BookReference.BookId == bookReference.BookId)
                 {
-                    BookReferences.Remove(entry);
-                    BookReferences.Add((true, bookReference));
+                    Books.Remove(entry);
+                    Books.Add((true, entry.BookViewModel));
                 }
             }
         }

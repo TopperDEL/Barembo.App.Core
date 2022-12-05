@@ -15,9 +15,15 @@ namespace Barembo.App.Core.ViewModels
     {
         readonly IBookService _bookService;
         readonly IEventAggregator _eventAggregator;
-        BookReference _bookReference;
         BookShelfViewModel _bookShelfViewModel;
 
+        private BookReference _bookReference;
+        public BookReference BookReference
+        {
+            get { return _bookReference; }
+            set { SetProperty(ref _bookReference, value); }
+        }
+        
         private Book book;
         public Book Book
         {
@@ -31,7 +37,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteCreateEntryCommand()
         {
-            _eventAggregator.GetEvent<CreateBookEntryMessage>().Publish(new Tuple<BookReference, BookShelfViewModel>(_bookReference, _bookShelfViewModel));
+            _eventAggregator.GetEvent<CreateBookEntryMessage>().Publish(new Tuple<BookReference, BookShelfViewModel>(BookReference, _bookShelfViewModel));
         }
 
         private DelegateCommand _shareBookCommand;
@@ -40,7 +46,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteShareBookCommand()
         {
-            _eventAggregator.GetEvent<ShareBookMessage>().Publish(_bookReference);
+            _eventAggregator.GetEvent<ShareBookMessage>().Publish(BookReference);
         }
 
         private DelegateCommand _showEntriesCommand;
@@ -49,7 +55,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteShowEntriesCommand()
         {
-            _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(_bookReference);
+            _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(BookReference);
         }
 
         internal BookViewModel(IBookService bookService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator)
@@ -73,8 +79,8 @@ namespace Barembo.App.Core.ViewModels
 
             try
             {
-                _bookReference = bookReference;
-                Book = await _bookService.LoadBookAsync(_bookReference);
+                BookReference = bookReference;
+                Book = await _bookService.LoadBookAsync(BookReference);
             }
             catch(Exception ex)
             {
