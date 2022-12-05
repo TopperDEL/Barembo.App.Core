@@ -16,6 +16,7 @@ namespace Barembo.App.Core.ViewModels
         readonly IBookService _bookService;
         readonly IEventAggregator _eventAggregator;
         BookReference _bookReference;
+        BookShelf _bookShelf;
 
         private Book book;
         public Book Book
@@ -30,7 +31,7 @@ namespace Barembo.App.Core.ViewModels
 
         void ExecuteCreateEntryCommand()
         {
-            _eventAggregator.GetEvent<CreateBookEntryMessage>().Publish(_bookReference);
+            _eventAggregator.GetEvent<CreateBookEntryMessage>().Publish(new Tuple<BookReference, BookShelf>(_bookReference, _bookShelf));
         }
 
         private DelegateCommand _shareBookCommand;
@@ -51,15 +52,16 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(_bookReference);
         }
 
-        internal BookViewModel(IBookService bookService, IEventAggregator eventAggregator)
+        internal BookViewModel(IBookService bookService, BookShelf bookShelf, IEventAggregator eventAggregator)
         {
             _bookService = bookService;
+            _bookShelf = bookShelf;
             _eventAggregator = eventAggregator;
         }
 
-        public static async Task<BookViewModel> CreateAsync(IBookService bookService, IEventAggregator eventAggregator, BookReference bookReference)
+        public static async Task<BookViewModel> CreateAsync(IBookService bookService, BookShelf bookShelf, IEventAggregator eventAggregator, BookReference bookReference)
         {
-            var bookVM = new BookViewModel(bookService, eventAggregator);
+            var bookVM = new BookViewModel(bookService, bookShelf, eventAggregator);
             await bookVM.InitAsync(bookReference).ConfigureAwait(false);
 
             return bookVM;

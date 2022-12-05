@@ -16,6 +16,7 @@ namespace Barembo.App.Core.Test.ViewModels
     public class BookViewModelTest
     {
         BookViewModel _viewModel;
+        BookShelf _bookShelf;
         Moq.Mock<IBookService> _bookServiceMock;
         Moq.Mock<IEventAggregator> _eventAggregator;
         StoreAccess _storeAccess;
@@ -24,9 +25,10 @@ namespace Barembo.App.Core.Test.ViewModels
         public void Init()
         {
             _storeAccess = new StoreAccess("use this access");
+            _bookShelf = new BookShelf();
             _eventAggregator = new Moq.Mock<IEventAggregator>();
             _bookServiceMock = new Moq.Mock<IBookService>();
-            _viewModel = new BookViewModel(_bookServiceMock.Object, _eventAggregator.Object);
+            _viewModel = new BookViewModel(_bookServiceMock.Object, _bookShelf, _eventAggregator.Object);
         }
 
         [TestMethod]
@@ -37,7 +39,7 @@ namespace Barembo.App.Core.Test.ViewModels
 
             _bookServiceMock.Setup(s => s.LoadBookAsync(bookReference)).Returns(Task.FromResult(book)).Verifiable();
 
-            await BookViewModel.CreateAsync(_bookServiceMock.Object, _eventAggregator.Object, bookReference);
+            await BookViewModel.CreateAsync(_bookServiceMock.Object, _bookShelf, _eventAggregator.Object, bookReference);
 
             _bookServiceMock.Verify();
             _eventAggregator.Verify();
