@@ -1,4 +1,5 @@
-﻿using Barembo.App.Core.Messages;
+﻿using Barembo.App.Core.HelperModels;
+using Barembo.App.Core.Messages;
 using Barembo.Exceptions;
 using Barembo.Interfaces;
 using Barembo.Models;
@@ -56,8 +57,8 @@ namespace Barembo.App.Core.ViewModels
             private set { SetProperty(ref _infoMessages, value); }
         }
 
-        private ObservableCollection<(bool Selected, BookViewModel BookViewModel)> _books;
-        public ObservableCollection<(bool Selected, BookViewModel BookViewModel)> Books
+        private ObservableCollection<BookSelection> _books;
+        public ObservableCollection<BookSelection> Books
         {
             get { return _books; }
             private set { SetProperty(ref _books, value); }
@@ -87,7 +88,7 @@ namespace Barembo.App.Core.ViewModels
         private Entry _entry;
         async Task ExecuteSaveEntryCommand()
         {
-            if(Books.Where(s=>s.Selected).Count() == 0)
+            if(Books.Where(s=>s.IsSelected).Count() == 0)
             {
                 _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.NoTargetBookSelected, ""));
                 return;
@@ -106,7 +107,7 @@ namespace Barembo.App.Core.ViewModels
                     return;
                 }
 
-                foreach (var book in Books.Where(s => s.Selected))
+                foreach (var book in Books.Where(s => s.IsSelected))
                 {
                     try
                     {
@@ -176,7 +177,7 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<MediaReceivedMessage>().Subscribe(HandleMediaReceived);
             _eventAggregator.GetEvent<InAppInfoMessage>().Subscribe(HandleInAppInfoMessageReceived);
 
-            Books = new ObservableCollection<(bool Selected, BookViewModel BookViewModel)>();
+            Books = new ObservableCollection<BookSelection>();
 
             Attachments = new ObservableCollection<MediaDataViewModel>();
             InfoMessages = new ObservableCollection<string>();
@@ -196,7 +197,7 @@ namespace Barembo.App.Core.ViewModels
         {
             foreach(var book in bookShelfViewModel.Books)
             {
-                Books.Add((bookReference.BookId == book.BookReference.BookId, book));
+                Books.Add(new BookSelection { IsSelected = bookReference.BookId == book.BookReference.BookId, BookViewModel = book });
             }
         }
 
@@ -206,8 +207,7 @@ namespace Barembo.App.Core.ViewModels
             {
                 if(entry.BookViewModel.BookReference.BookId == bookReference.BookId)
                 {
-                    Books.Remove(entry);
-                    Books.Add((true, entry.BookViewModel));
+                    entry.IsSelected = true;
                 }
             }
         }
