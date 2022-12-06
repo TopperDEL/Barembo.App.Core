@@ -79,6 +79,32 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public void Init_ClearsEntry_AfterPreviousSave()
+        {
+            BookReference bookReference = new BookReference();
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            EntryReference entryRef = new EntryReference();
+            Entry entry = new Entry();
+
+            _viewModel.Header = "header";
+            _viewModel.Body = "body";
+
+            _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage()).Verifiable();
+            _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
+            _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
+
+            _viewModel.Init(bookReference, _bookShelfViewModel);
+            _viewModel.SaveEntryCommand.Execute();
+            _viewModel.Init(bookReference, _bookShelfViewModel);
+
+            Assert.AreEqual("", _viewModel.Body);
+            Assert.AreEqual("", _viewModel.Header);
+            Assert.AreEqual(1, _viewModel.Books.Count);
+            Assert.AreEqual(0, _viewModel.Attachments.Count);
+        }
+
+        [TestMethod]
         public void ExecuteSaveEntry_Saves_EntryForMultipleBooks()
         {
             BookReference bookReference1 = new BookReference { BookId = "First book" };

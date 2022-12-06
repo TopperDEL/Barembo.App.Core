@@ -195,6 +195,11 @@ namespace Barembo.App.Core.ViewModels
 
         public void Init(BookReference bookReference, BookShelfViewModel bookShelfViewModel)
         {
+            Header = "";
+            Body = "";
+            Attachments.Clear();
+            Books.Clear();
+
             foreach(var book in bookShelfViewModel.Books)
             {
                 Books.Add(new BookSelection { IsSelected = bookReference.BookId == book.BookReference.BookId, BookViewModel = book });
