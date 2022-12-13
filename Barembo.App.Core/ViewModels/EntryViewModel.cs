@@ -64,6 +64,8 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
+        public bool HasThumbnail { get; set; } = false;
+
         public DateTime CreationDate
         {
             get
@@ -144,6 +146,11 @@ namespace Barembo.App.Core.ViewModels
             _entry = entry;
 
             EntryLoaded?.Invoke(this, _entry);
+
+            if(!string.IsNullOrEmpty(_entry.ThumbnailBase64))
+            {
+                HasThumbnail= true;
+            }
 
             IsLoading = false;
 
