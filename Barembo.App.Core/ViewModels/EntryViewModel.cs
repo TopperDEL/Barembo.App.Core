@@ -157,6 +157,7 @@ namespace Barembo.App.Core.ViewModels
             RaisePropertyChanged(nameof(Header));
             RaisePropertyChanged(nameof(Body));
             RaisePropertyChanged(nameof(Thumbnail));
+            RaisePropertyChanged(nameof(HasThumbnail));
         }
     }
 }

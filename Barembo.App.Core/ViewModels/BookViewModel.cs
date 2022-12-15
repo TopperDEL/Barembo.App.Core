@@ -33,6 +33,23 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref book, value); }
         }
 
+        public byte[] Thumbnail
+        {
+            get
+            {
+                if (book == null)
+                {
+                    return null;
+                }
+                else if (string.IsNullOrEmpty(book.CoverImageBase64))
+                    return null;
+
+                return Convert.FromBase64String(book.CoverImageBase64);
+            }
+        }
+
+        public bool HasThumbnail { get; set; } = false;
+
         private DelegateCommand _createEntryCommand;
         public DelegateCommand CreateEntryCommand =>
             _createEntryCommand ?? (_createEntryCommand = new DelegateCommand(ExecuteCreateEntryCommand));
@@ -95,6 +112,8 @@ namespace Barembo.App.Core.ViewModels
                             if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
                             {
                                 Book.CoverImageBase64 = entry.ThumbnailBase64;
+                                RaisePropertyChanged(nameof(Thumbnail));
+                                RaisePropertyChanged(nameof(HasThumbnail));
                                 break;
                             }
                         }
