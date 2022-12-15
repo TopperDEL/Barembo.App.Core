@@ -110,6 +110,8 @@ namespace Barembo.App.Core.ViewModels
                     {
                         var entryReferences = await _entryService.ListEntriesAsync(bookReference);
                         EntryCount = entryReferences.Count();
+                        RaisePropertyChanged(nameof(EntryCount));
+
                         foreach (var entryReference in entryReferences)
                         {
                             var entry = await _entryService.LoadEntryAsync(entryReference);
