@@ -148,6 +148,38 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public async Task CreateAsync_SetsEntryCount()
+        {
+            BookReference bookReference = new BookReference();
+            Book book = new Book();
+            Entry entry1 = new Entry { Id = "First" };
+            Entry entry2 = new Entry { Id = "Second" };
+            Entry entry3 = new Entry { Id = "Third", ThumbnailBase64 = "MyThumbFromThird" };
+            EntryReference entryref1 = new EntryReference { EntryId = "First" };
+            EntryReference entryref2 = new EntryReference { EntryId = "Second" };
+            EntryReference entryref3 = new EntryReference { EntryId = "Third" };
+            List<EntryReference> entryRefs = new List<EntryReference>
+            {
+                entryref1,
+                entryref2,
+                entryref3
+            };
+
+            _bookServiceMock.Setup(s => s.LoadBookAsync(bookReference)).Returns(Task.FromResult(book)).Verifiable();
+            _entryServiceMock.Setup(s => s.ListEntriesAsync(bookReference)).Returns(Task.FromResult(entryRefs as IEnumerable<EntryReference>)).Verifiable();
+            _entryServiceMock.Setup(s => s.LoadEntryAsync(entryref1)).Returns(Task.FromResult(entry1)).Verifiable();
+            _entryServiceMock.Setup(s => s.LoadEntryAsync(entryref2)).Returns(Task.FromResult(entry2)).Verifiable();
+            _entryServiceMock.Setup(s => s.LoadEntryAsync(entryref3)).Returns(Task.FromResult(entry3)).Verifiable();
+
+            var bookVm = await BookViewModel.CreateAsync(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object, bookReference);
+
+            Assert.AreEqual(3, bookVm.EntryCount);
+            _bookServiceMock.Verify();
+            _entryServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
         public async Task InitAsync_DoesNotSetLoadingFailed_IfSuccessfull()
         {
             BookReference bookReference = new BookReference();

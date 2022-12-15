@@ -7,6 +7,7 @@ using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +50,8 @@ namespace Barembo.App.Core.ViewModels
         }
 
         public bool HasThumbnail { get; set; } = false;
+
+        public int EntryCount { get; set; } = 0;
 
         private DelegateCommand _createEntryCommand;
         public DelegateCommand CreateEntryCommand =>
@@ -106,6 +109,7 @@ namespace Barembo.App.Core.ViewModels
                     try
                     {
                         var entryReferences = await _entryService.ListEntriesAsync(bookReference);
+                        EntryCount = entryReferences.Count();
                         foreach (var entryReference in entryReferences)
                         {
                             var entry = await _entryService.LoadEntryAsync(entryReference);
