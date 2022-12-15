@@ -32,7 +32,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _bookShelfServiceMock = new Moq.Mock<IBookShelfService>();
             _bookServiceMock = new Moq.Mock<IBookService>();
             _thumbnailGeneratorService = new Moq.Mock<IThumbnailGeneratorService>();
-            _bookShelfViewModel = new BookShelfViewModel(_bookShelfServiceMock.Object, _eventAggregator.Object, _bookServiceMock.Object);
+            _bookShelfViewModel = new BookShelfViewModel(_bookShelfServiceMock.Object,  _eventAggregator.Object, _bookServiceMock.Object, _entryServiceMock.Object);
             _eventAggregator.Setup(s => s.GetEvent<MediaReceivedMessage>()).Returns(new MediaReceivedMessage());
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage());
             _viewModel = new CreateBookEntryViewModel(_entryServiceMock.Object, _eventAggregator.Object, _thumbnailGeneratorService.Object);
@@ -42,7 +42,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Publishes_Message()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             Entry entry = new Entry();
 
             _viewModel.Init(bookReference, _bookShelfViewModel);
@@ -60,7 +60,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Saves_Entry()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -83,7 +83,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void Init_ClearsEntry_AfterPreviousSave()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -109,11 +109,11 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Saves_EntryForMultipleBooks()
         {
             BookReference bookReference1 = new BookReference { BookId = "First book" };
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference1 });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference1 });
             BookReference bookReference2 = new BookReference { BookId = "Second book" };
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference2 });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference2 });
             BookReference bookReference3 = new BookReference { BookId = "Third book" };
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference3 });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference3 });
             EntryReference entryRef1 = new EntryReference();
             EntryReference entryRef2 = new EntryReference();
             Entry entry = new Entry();
@@ -139,7 +139,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_InformsUser_AboutSavedEntry()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -162,7 +162,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_SetsAndClears_SaveInProgress()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -187,7 +187,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Saves_Attachments()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -220,7 +220,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_Saves_AttachmentsWithSecondOneNotSettingThumbnail()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -261,7 +261,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfEntryCouldNotBeCreated()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             Entry entry = null;
 
             _viewModel.Init(bookReference, _bookShelfViewModel);
@@ -298,7 +298,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfEntryCouldNotBeAddedToBook()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             Entry entry = new Entry();
 
             _viewModel.Init(bookReference, _bookShelfViewModel);
@@ -319,7 +319,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfAttachmentCouldNotBeSaved()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 
@@ -351,7 +351,7 @@ namespace Barembo.App.Core.Test.ViewModels
         public void ExecuteSaveEntry_RaisesError_IfThumbnailCouldNotBeSet()
         {
             BookReference bookReference = new BookReference();
-            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
+            _bookShelfViewModel.Books.Add(new BookViewModel(_bookServiceMock.Object, _entryServiceMock.Object, _bookShelfViewModel, _eventAggregator.Object) { BookReference = bookReference });
             EntryReference entryRef = new EntryReference();
             Entry entry = new Entry();
 

@@ -1,4 +1,5 @@
 ﻿using Barembo.App.Core.Messages;
+using Barembo.Exceptions;
 using Barembo.Interfaces;
 using Barembo.Models;
 using Prism.Commands;
@@ -14,6 +15,7 @@ namespace Barembo.App.Core.ViewModels
     public class BookViewModel : AsyncLoadingBindableBase
     {
         readonly IBookService _bookService;
+        readonly IEntryService _entryService;
         readonly IEventAggregator _eventAggregator;
         BookShelfViewModel _bookShelfViewModel;
 
@@ -58,16 +60,17 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(BookReference);
         }
 
-        internal BookViewModel(IBookService bookService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator)
+        internal BookViewModel(IBookService bookService, IEntryService entryService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator)
         {
             _bookService = bookService;
+            _entryService = entryService;
             _bookShelfViewModel = bookShelfViewModel;
             _eventAggregator = eventAggregator;
         }
 
-        public static async Task<BookViewModel> CreateAsync(IBookService bookService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator, BookReference bookReference)
+        public static async Task<BookViewModel> CreateAsync(IBookService bookService, IEntryService entryService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator, BookReference bookReference)
         {
-            var bookVM = new BookViewModel(bookService, bookShelfViewModel, eventAggregator);
+            var bookVM = new BookViewModel(bookService, entryService, bookShelfViewModel, eventAggregator);
             await bookVM.InitAsync(bookReference).ConfigureAwait(false);
 
             return bookVM;
@@ -81,6 +84,26 @@ namespace Barembo.App.Core.ViewModels
             {
                 BookReference = bookReference;
                 Book = await _bookService.LoadBookAsync(BookReference);
+                if(string.IsNullOrEmpty(Book.CoverImageBase64))
+                {
+                    try
+                    {
+                        var entryReferences = await _entryService.ListEntriesAsync(bookReference);
+                        foreach (var entryReference in entryReferences)
+                        {
+                            var entry = await _entryService.LoadEntryAsync(entryReference);
+                            if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
+                            {
+                                Book.CoverImageBase64 = entry.ThumbnailBase64;
+                                break;
+                            }
+                        }
+                    }
+                    catch(ActionNotAllowedException)
+                    {
+                        //Ignore - then we have no Entries to get a thumbnail from.
+                    }
+                }
             }
             catch(Exception ex)
             {

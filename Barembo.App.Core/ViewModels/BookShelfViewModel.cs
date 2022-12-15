@@ -18,6 +18,7 @@ namespace Barembo.App.Core.ViewModels
     {
         readonly IBookShelfService _bookShelfService;
         readonly IBookService _bookService;
+        readonly IEntryService _entryService;
         readonly IEventAggregator _eventAggregator;
         internal StoreAccess _storeAccess;
 
@@ -53,11 +54,12 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<AddForeignBookMessage>().Publish(new Tuple<StoreAccess, BookShelf>(_storeAccess, _bookShelf));
         }
 
-        public BookShelfViewModel(IBookShelfService bookShelfService, IEventAggregator eventAggregator, IBookService bookService)
+        public BookShelfViewModel(IBookShelfService bookShelfService, IEventAggregator eventAggregator, IBookService bookService, IEntryService entryService)
         {
             _bookShelfService = bookShelfService;
             _eventAggregator = eventAggregator;
             _bookService = bookService;
+            _entryService = entryService;
 
             Books = new ObservableCollection<BookViewModel>();
         }
@@ -82,7 +84,7 @@ namespace Barembo.App.Core.ViewModels
 
                 foreach (var bookReference in BookShelf.Content)
                 {
-                    var bookVM = await BookViewModel.CreateAsync(_bookService, this, _eventAggregator, bookReference);
+                    var bookVM = await BookViewModel.CreateAsync(_bookService, _entryService, this, _eventAggregator, bookReference);
                     Books.Add(bookVM);
                 }
             }
