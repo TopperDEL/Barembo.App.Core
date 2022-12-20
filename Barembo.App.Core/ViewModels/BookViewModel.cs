@@ -103,18 +103,18 @@ namespace Barembo.App.Core.ViewModels
             try
             {
                 BookReference = bookReference;
-                Book = await _bookService.LoadBookAsync(BookReference);
+                Book = await _bookService.LoadBookAsync(BookReference).ConfigureAwait(false);
                 if(string.IsNullOrEmpty(Book.CoverImageBase64))
                 {
                     try
                     {
-                        var entryReferences = await _entryService.ListEntriesAsync(bookReference);
+                        var entryReferences = await _entryService.ListEntriesAsync(bookReference).ConfigureAwait(false);
                         EntryCount = entryReferences.Count();
                         RaisePropertyChanged(nameof(EntryCount));
 
                         foreach (var entryReference in entryReferences)
                         {
-                            var entry = await _entryService.LoadEntryAsync(entryReference);
+                            var entry = await _entryService.LoadEntryAsync(entryReference).ConfigureAwait(false);
                             if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
                             {
                                 Book.CoverImageBase64 = entry.ThumbnailBase64;
