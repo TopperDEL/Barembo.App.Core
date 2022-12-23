@@ -116,7 +116,7 @@ namespace Barembo.App.Core.ViewModels
             }
 
             var entry = await _entryService.LoadEntryAsync(_entryReference);
-            _synchronizationContext.Post((o) =>
+            _synchronizationContext.Post((_) =>
             {
                 InitFromEntry(entry);
             }, null);
