@@ -18,7 +18,7 @@ namespace Barembo.App.Core.ViewModels
         readonly IBookService _bookService;
         readonly IEntryService _entryService;
         readonly IEventAggregator _eventAggregator;
-        BookShelfViewModel _bookShelfViewModel;
+        readonly BookShelfViewModel _bookShelfViewModel;
 
         private BookReference _bookReference;
         public BookReference BookReference
@@ -49,9 +49,9 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public bool HasThumbnail { get; set; } = false;
+        public bool HasThumbnail { get; set; }
 
-        public int EntryCount { get; set; } = 0;
+        public int EntryCount { get; set; }
 
         private DelegateCommand _createEntryCommand;
         public DelegateCommand CreateEntryCommand =>

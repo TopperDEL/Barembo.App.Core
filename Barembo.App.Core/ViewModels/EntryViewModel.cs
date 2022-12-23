@@ -64,7 +64,7 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public bool HasThumbnail { get; set; } = false;
+        public bool HasThumbnail { get; set; }
 
         public DateTime CreationDate
         {
@@ -97,7 +97,7 @@ namespace Barembo.App.Core.ViewModels
                 _entryService.LoadEntryAsSoonAsPossible(
                     _entryReference, //The entry to load
                     (loadedEntry) =>
-                        _synchronizationContext.Post((o) =>
+                        _synchronizationContext.Post((_) =>
                         {
                             InitFromEntry(loadedEntry);
                         }, null), //If the entry got loaded, Refresh the values on the UI-Thread
