@@ -96,9 +96,9 @@ namespace Barembo.App.Core.ViewModels
                     var bookShareReference = _magicLinkResolver.GetBookShareReferenceFrom(MagicLink);
                     _eventAggregator.GetEvent<BookToImportMessage>().Publish(bookShareReference);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.NoBookShareReferenceMagicLink, ""));
+                    _eventAggregator.GetEvent<ErrorMessage>().Publish(new Tuple<ErrorType, string>(ErrorType.NoBookShareReferenceMagicLink, ex.Message));
                     return;
                 }
             }
