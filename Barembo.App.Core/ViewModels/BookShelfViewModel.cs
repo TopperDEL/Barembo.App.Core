@@ -36,6 +36,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _bookShelf, value); }
         }
 
+        private bool _noBookShelfExists;
+        public bool NoBookShelfExists
+        {
+            get { return _noBookShelfExists; }
+            set { SetProperty(ref _noBookShelfExists, value); }
+        }
+
         private DelegateCommand _addOwnBookCommand;
         public DelegateCommand AddOwnBookCommand =>
             _addOwnBookCommand ?? (_addOwnBookCommand = new DelegateCommand(ExecuteAddOwnBookCommand));
@@ -90,6 +97,7 @@ namespace Barembo.App.Core.ViewModels
             }
             catch (NoBookShelfExistsException ex)
             {
+                NoBookShelfExists = true;
                 _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(storeAccess, ex.Message + " - " + ex.AccessGrant + " - " + ex.AdditionalError + " - " + ex.StoreKey + " - " + tryCount.ToString() + " - " + ex.StackTrace));
             }
         }

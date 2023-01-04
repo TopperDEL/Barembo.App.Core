@@ -49,6 +49,24 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public async Task Init_SetsNoBookShelfExists_IfNoBookShelfExists()
+        {
+            NoBookShelfExistsMessage msg = new NoBookShelfExistsMessage();
+
+            _bookShelfServiceMock.Setup(s => s.LoadBookShelfAsync(_storeAccess)).Throws(new NoBookShelfExistsException("", "", "")).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<NoBookShelfExistsMessage>()).Returns(msg).Verifiable();
+
+            Assert.IsFalse(_viewModel.NoBookShelfExists);
+            
+            await _viewModel.InitAsync(_storeAccess);
+
+            Assert.IsTrue(_viewModel.NoBookShelfExists);
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
         public async Task Init_AddsBookViewModel_ForEachBookReference()
         {
             BookShelf bookShelf = new BookShelf();
