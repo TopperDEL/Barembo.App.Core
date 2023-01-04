@@ -50,6 +50,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _noBooks, value); }
         }
 
+        private bool _hasBooks;
+        public bool HasBooks
+        {
+            get { return _hasBooks; }
+            set { SetProperty(ref _hasBooks, value); }
+        }
+
         private DelegateCommand _addOwnBookCommand;
         public DelegateCommand AddOwnBookCommand =>
             _addOwnBookCommand ?? (_addOwnBookCommand = new DelegateCommand(ExecuteAddOwnBookCommand));
@@ -112,6 +119,8 @@ namespace Barembo.App.Core.ViewModels
                 }
 
                 NoBooks = Books.Count == 0;
+                HasBooks = Books.Count > 0;
+                NoBookShelfExists = false;
             }
             catch (NoBookShelfExistsException ex)
             {
