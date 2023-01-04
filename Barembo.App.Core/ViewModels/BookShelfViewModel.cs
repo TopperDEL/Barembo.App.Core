@@ -43,6 +43,13 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _noBookShelfExists, value); }
         }
 
+        private bool _noBooks;
+        public bool NoBooks
+        {
+            get { return _noBooks; }
+            set { SetProperty(ref _noBooks, value); }
+        }
+
         private DelegateCommand _addOwnBookCommand;
         public DelegateCommand AddOwnBookCommand =>
             _addOwnBookCommand ?? (_addOwnBookCommand = new DelegateCommand(ExecuteAddOwnBookCommand));
@@ -94,6 +101,8 @@ namespace Barembo.App.Core.ViewModels
                     var bookVM = await BookViewModel.CreateAsync(_bookService, _entryService, this, _eventAggregator, bookReference);
                     Books.Add(bookVM);
                 }
+
+                NoBooks = Books.Count == 0;
             }
             catch (NoBookShelfExistsException ex)
             {
