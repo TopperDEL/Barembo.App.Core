@@ -142,6 +142,7 @@ namespace Barembo.App.Core.Test.ViewModels
             await _viewModel.InitAsync(_storeAccess);
 
             Assert.AreEqual(_viewModel.BookShelf, bookShelf);
+            Assert.IsFalse(_viewModel.NoBookShelfExists);
 
             _bookShelfServiceMock.Verify();
             _eventAggregator.Verify();
