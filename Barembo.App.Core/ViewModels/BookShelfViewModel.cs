@@ -101,7 +101,7 @@ namespace Barembo.App.Core.ViewModels
                 }catch
                 {
                     tryCount++;
-                    await Task.Delay(1000).ConfigureAwait(false); //ToDo: Check if this works in production - it might use another thread and crash
+                    await Task.Delay(1000); 
                     BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess); //Crashes as Bookshelf is created on the UI-thread with ConfigureAwait;
                 }
 
