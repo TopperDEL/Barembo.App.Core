@@ -168,5 +168,17 @@ namespace Barembo.App.Core.Test.ViewModels
             _bookShelfServiceMock.Verify();
             _eventAggregator.Verify();
         }
+
+        [TestMethod]
+        public void CreateBookShelfCommand_Raises_NoBookShelfExistsMessage()
+        {
+            NoBookShelfExistsMessage msg = new NoBookShelfExistsMessage();
+            _eventAggregator.Setup(s => s.GetEvent<NoBookShelfExistsMessage>()).Returns(msg).Verifiable();
+
+            _viewModel.CreateBookShelfCommand.Execute();
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
     }
 }

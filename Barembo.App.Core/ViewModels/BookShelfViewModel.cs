@@ -68,6 +68,15 @@ namespace Barembo.App.Core.ViewModels
             _eventAggregator.GetEvent<AddForeignBookMessage>().Publish(new Tuple<StoreAccess, BookShelf>(_storeAccess, _bookShelf));
         }
 
+        private DelegateCommand _createBookShelfCommand;
+        public DelegateCommand CreateBookShelfCommand =>
+            _createBookShelfCommand ?? (_createBookShelfCommand = new DelegateCommand(ExecuteCreateBookShelfCommand));
+
+        void ExecuteCreateBookShelfCommand()
+        {
+            _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(_storeAccess, ""));
+        }
+
         public BookShelfViewModel(IBookShelfService bookShelfService, IEventAggregator eventAggregator, IBookService bookService, IEntryService entryService)
         {
             _bookShelfService = bookShelfService;
