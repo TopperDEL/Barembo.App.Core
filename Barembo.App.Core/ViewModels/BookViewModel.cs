@@ -112,16 +112,23 @@ namespace Barembo.App.Core.ViewModels
                         EntryCount = entryReferences.Count();
                         RaisePropertyChanged(nameof(EntryCount));
 
-                        foreach (var entryReference in entryReferences)
+                        try
                         {
-                            var entry = await _entryService.LoadEntryAsync(entryReference).ConfigureAwait(false);
-                            if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
+                            foreach (var entryReference in entryReferences)
                             {
-                                Book.CoverImageBase64 = entry.ThumbnailBase64;
-                                RaisePropertyChanged(nameof(Thumbnail));
-                                RaisePropertyChanged(nameof(HasThumbnail));
-                                break;
+                                var entry = await _entryService.LoadEntryAsync(entryReference).ConfigureAwait(false);
+                                if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
+                                {
+                                    Book.CoverImageBase64 = entry.ThumbnailBase64;
+                                    RaisePropertyChanged(nameof(Thumbnail));
+                                    RaisePropertyChanged(nameof(HasThumbnail));
+                                    break;
+                                }
                             }
+                        }
+                        catch
+                        {
+                            //Ignore missing thumbnail
                         }
                     }
                     catch(ActionNotAllowedException)
