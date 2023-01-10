@@ -49,6 +49,24 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public async Task Init_SetsNoBookShelfExists_IfNoBookShelfExists()
+        {
+            NoBookShelfExistsMessage msg = new NoBookShelfExistsMessage();
+
+            _bookShelfServiceMock.Setup(s => s.LoadBookShelfAsync(_storeAccess)).Throws(new NoBookShelfExistsException("", "", "")).Verifiable();
+            _eventAggregator.Setup(s => s.GetEvent<NoBookShelfExistsMessage>()).Returns(msg).Verifiable();
+
+            Assert.IsFalse(_viewModel.NoBookShelfExists);
+            
+            await _viewModel.InitAsync(_storeAccess);
+
+            Assert.IsTrue(_viewModel.NoBookShelfExists);
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
         public async Task Init_AddsBookViewModel_ForEachBookReference()
         {
             BookShelf bookShelf = new BookShelf();
@@ -65,6 +83,56 @@ namespace Barembo.App.Core.Test.ViewModels
         }
 
         [TestMethod]
+        public async Task Init_SetsNoBooksToFalse_IfBooksExist()
+        {
+            BookShelf bookShelf = new BookShelf();
+            bookShelf.Content.Add(new BookReference());
+
+            _bookShelfServiceMock.Setup(s => s.LoadBookShelfAsync(_storeAccess)).Returns(Task.FromResult(bookShelf)).Verifiable();
+
+            await _viewModel.InitAsync(_storeAccess);
+
+            Assert.AreEqual(_viewModel.Books.Count, bookShelf.Content.Count);
+            Assert.IsFalse(_viewModel.NoBooks);
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
+        public async Task Init_SetsHasBooksToTrue_IfBooksExist()
+        {
+            BookShelf bookShelf = new BookShelf();
+            bookShelf.Content.Add(new BookReference());
+
+            _bookShelfServiceMock.Setup(s => s.LoadBookShelfAsync(_storeAccess)).Returns(Task.FromResult(bookShelf)).Verifiable();
+
+            await _viewModel.InitAsync(_storeAccess);
+
+            Assert.AreEqual(_viewModel.Books.Count, bookShelf.Content.Count);
+            Assert.IsTrue(_viewModel.HasBooks);
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
+        public async Task Init_SetsNoBooksToTrue_IfNoBooksExists()
+        {
+            BookShelf bookShelf = new BookShelf();
+
+            _bookShelfServiceMock.Setup(s => s.LoadBookShelfAsync(_storeAccess)).Returns(Task.FromResult(bookShelf)).Verifiable();
+
+            await _viewModel.InitAsync(_storeAccess);
+
+            Assert.AreEqual(_viewModel.Books.Count, bookShelf.Content.Count);
+            Assert.IsTrue(_viewModel.NoBooks);
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
         public async Task Init_SetsBookShelf_OnViewModel()
         {
             BookShelf bookShelf = new BookShelf();
@@ -74,6 +142,7 @@ namespace Barembo.App.Core.Test.ViewModels
             await _viewModel.InitAsync(_storeAccess);
 
             Assert.AreEqual(_viewModel.BookShelf, bookShelf);
+            Assert.IsFalse(_viewModel.NoBookShelfExists);
 
             _bookShelfServiceMock.Verify();
             _eventAggregator.Verify();
@@ -113,6 +182,18 @@ namespace Barembo.App.Core.Test.ViewModels
             _eventAggregator.Setup(s => s.GetEvent<AddForeignBookMessage>()).Returns(msg).Verifiable();
 
             _viewModel.AddForeignBookCommand.Execute();
+
+            _bookShelfServiceMock.Verify();
+            _eventAggregator.Verify();
+        }
+
+        [TestMethod]
+        public void CreateBookShelfCommand_Raises_NoBookShelfExistsMessage()
+        {
+            NoBookShelfExistsMessage msg = new NoBookShelfExistsMessage();
+            _eventAggregator.Setup(s => s.GetEvent<NoBookShelfExistsMessage>()).Returns(msg).Verifiable();
+
+            _viewModel.CreateBookShelfCommand.Execute();
 
             _bookShelfServiceMock.Verify();
             _eventAggregator.Verify();

@@ -36,6 +36,27 @@ namespace Barembo.App.Core.ViewModels
             set { SetProperty(ref _bookShelf, value); }
         }
 
+        private bool _noBookShelfExists;
+        public bool NoBookShelfExists
+        {
+            get { return _noBookShelfExists; }
+            set { SetProperty(ref _noBookShelfExists, value); }
+        }
+
+        private bool _noBooks;
+        public bool NoBooks
+        {
+            get { return _noBooks; }
+            set { SetProperty(ref _noBooks, value); }
+        }
+
+        private bool _hasBooks;
+        public bool HasBooks
+        {
+            get { return _hasBooks; }
+            set { SetProperty(ref _hasBooks, value); }
+        }
+
         private DelegateCommand _addOwnBookCommand;
         public DelegateCommand AddOwnBookCommand =>
             _addOwnBookCommand ?? (_addOwnBookCommand = new DelegateCommand(ExecuteAddOwnBookCommand));
@@ -52,6 +73,15 @@ namespace Barembo.App.Core.ViewModels
         void ExecuteAddForeignBookCommand()
         {
             _eventAggregator.GetEvent<AddForeignBookMessage>().Publish(new Tuple<StoreAccess, BookShelf>(_storeAccess, _bookShelf));
+        }
+
+        private DelegateCommand _createBookShelfCommand;
+        public DelegateCommand CreateBookShelfCommand =>
+            _createBookShelfCommand ?? (_createBookShelfCommand = new DelegateCommand(ExecuteCreateBookShelfCommand));
+
+        void ExecuteCreateBookShelfCommand()
+        {
+            _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(_storeAccess, ""));
         }
 
         public BookShelfViewModel(IBookShelfService bookShelfService, IEventAggregator eventAggregator, IBookService bookService, IEntryService entryService)
@@ -74,12 +104,12 @@ namespace Barembo.App.Core.ViewModels
                 try
                 {
                     tryCount++;
-                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
-                }catch(Exception ex)
+                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess); //Crashes as Bookshelf is created on the UI-thread with ConfigureAwait;
+                }catch
                 {
                     tryCount++;
-                    await Task.Delay(1000).ConfigureAwait(false);
-                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
+                    await Task.Delay(1000); 
+                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess); //Crashes as Bookshelf is created on the UI-thread with ConfigureAwait;
                 }
 
                 foreach (var bookReference in BookShelf.Content)
@@ -87,9 +117,14 @@ namespace Barembo.App.Core.ViewModels
                     var bookVM = await BookViewModel.CreateAsync(_bookService, _entryService, this, _eventAggregator, bookReference);
                     Books.Add(bookVM);
                 }
+
+                NoBooks = Books.Count == 0;
+                HasBooks = Books.Count > 0;
+                NoBookShelfExists = false;
             }
             catch (NoBookShelfExistsException ex)
             {
+                NoBookShelfExists = true;
                 _eventAggregator.GetEvent<NoBookShelfExistsMessage>().Publish(new Tuple<StoreAccess, string>(storeAccess, ex.Message + " - " + ex.AccessGrant + " - " + ex.AdditionalError + " - " + ex.StoreKey + " - " + tryCount.ToString() + " - " + ex.StackTrace));
             }
         }

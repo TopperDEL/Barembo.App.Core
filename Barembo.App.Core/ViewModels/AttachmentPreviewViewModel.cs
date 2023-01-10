@@ -63,8 +63,8 @@ namespace Barembo.App.Core.ViewModels
         public bool ShowVideoPreview5 { get { return _currentVideoPreviewImageNumber == 4; } }
         public bool ShowVideoPreview6 { get { return _currentVideoPreviewImageNumber == 5; } }
 
-        public List<byte[]> _videoPreviewBytes;
-        public int _currentVideoPreviewImageNumber;
+        private List<byte[]> _videoPreviewBytes;
+        private int _currentVideoPreviewImageNumber;
 
         public AttachmentPreviewViewModel(AttachmentPreview attachmentPreview)
         {
@@ -87,7 +87,7 @@ namespace Barembo.App.Core.ViewModels
             RaisePropertyChanged(nameof(ShowVideoPreview6));
         }
 
-        protected virtual void InitVideoPreviewBytes()
+        private void InitVideoPreviewBytes()
         {
             if (_attachmentPreview.Type == AttachmentType.Video)
             {

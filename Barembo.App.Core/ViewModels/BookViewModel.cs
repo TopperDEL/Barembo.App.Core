@@ -18,7 +18,7 @@ namespace Barembo.App.Core.ViewModels
         readonly IBookService _bookService;
         readonly IEntryService _entryService;
         readonly IEventAggregator _eventAggregator;
-        BookShelfViewModel _bookShelfViewModel;
+        readonly BookShelfViewModel _bookShelfViewModel;
 
         private BookReference _bookReference;
         public BookReference BookReference
@@ -49,9 +49,9 @@ namespace Barembo.App.Core.ViewModels
             }
         }
 
-        public bool HasThumbnail { get; set; } = false;
+        public bool HasThumbnail { get; set; }
 
-        public int EntryCount { get; set; } = 0;
+        public int EntryCount { get; set; }
 
         private DelegateCommand _createEntryCommand;
         public DelegateCommand CreateEntryCommand =>
@@ -103,25 +103,32 @@ namespace Barembo.App.Core.ViewModels
             try
             {
                 BookReference = bookReference;
-                Book = await _bookService.LoadBookAsync(BookReference);
+                Book = await _bookService.LoadBookAsync(BookReference).ConfigureAwait(false);
                 if(string.IsNullOrEmpty(Book.CoverImageBase64))
                 {
                     try
                     {
-                        var entryReferences = await _entryService.ListEntriesAsync(bookReference);
+                        var entryReferences = await _entryService.ListEntriesAsync(bookReference).ConfigureAwait(false);
                         EntryCount = entryReferences.Count();
                         RaisePropertyChanged(nameof(EntryCount));
 
-                        foreach (var entryReference in entryReferences)
+                        try
                         {
-                            var entry = await _entryService.LoadEntryAsync(entryReference);
-                            if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
+                            foreach (var entryReference in entryReferences)
                             {
-                                Book.CoverImageBase64 = entry.ThumbnailBase64;
-                                RaisePropertyChanged(nameof(Thumbnail));
-                                RaisePropertyChanged(nameof(HasThumbnail));
-                                break;
+                                var entry = await _entryService.LoadEntryAsync(entryReference).ConfigureAwait(false);
+                                if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
+                                {
+                                    Book.CoverImageBase64 = entry.ThumbnailBase64;
+                                    RaisePropertyChanged(nameof(Thumbnail));
+                                    RaisePropertyChanged(nameof(HasThumbnail));
+                                    break;
+                                }
                             }
+                        }
+                        catch
+                        {
+                            //Ignore missing thumbnail
                         }
                     }
                     catch(ActionNotAllowedException)
