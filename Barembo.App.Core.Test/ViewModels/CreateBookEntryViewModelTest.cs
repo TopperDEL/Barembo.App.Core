@@ -22,6 +22,7 @@ namespace Barembo.App.Core.Test.ViewModels
         Moq.Mock<IBookService> _bookServiceMock;
         Moq.Mock<IEventAggregator> _eventAggregator;
         Moq.Mock<IThumbnailGeneratorService> _thumbnailGeneratorService;
+        Moq.Mock<IBackgroundActionService> _backgroundActionService;
         BookShelfViewModel _bookShelfViewModel;
 
         [TestInitialize]
@@ -32,10 +33,12 @@ namespace Barembo.App.Core.Test.ViewModels
             _bookShelfServiceMock = new Moq.Mock<IBookShelfService>();
             _bookServiceMock = new Moq.Mock<IBookService>();
             _thumbnailGeneratorService = new Moq.Mock<IThumbnailGeneratorService>();
+            _backgroundActionService = new Moq.Mock<IBackgroundActionService>();
+
             _bookShelfViewModel = new BookShelfViewModel(_bookShelfServiceMock.Object,  _eventAggregator.Object, _bookServiceMock.Object, _entryServiceMock.Object);
             _eventAggregator.Setup(s => s.GetEvent<MediaReceivedMessage>()).Returns(new MediaReceivedMessage());
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage());
-            _viewModel = new CreateBookEntryViewModel(_entryServiceMock.Object, _eventAggregator.Object, _thumbnailGeneratorService.Object);
+            _viewModel = new CreateBookEntryViewModel(_entryServiceMock.Object, _eventAggregator.Object, _thumbnailGeneratorService.Object, _backgroundActionService.Object);
         }
 
         [TestMethod]
@@ -207,8 +210,8 @@ namespace Barembo.App.Core.Test.ViewModels
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
+            _backgroundActionService.Setup(s => s.AddAttachmentInBackgroundAsync(entryRef, attachment, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
+            _backgroundActionService.Setup(s => s.SetThumbnailInBackgroundAsync(entryRef, attachment, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
 
             _viewModel.SaveEntryCommand.Execute();
 
@@ -246,9 +249,9 @@ namespace Barembo.App.Core.Test.ViewModels
             _eventAggregator.Setup(s => s.GetEvent<BookEntrySavedMessage>()).Returns(new BookEntrySavedMessage()).Verifiable();
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment1, attachmentBinary1, "pathToFile1")).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment1, attachmentBinary1, "pathToFile1")).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment2, attachmentBinary2, "pathToFile2")).Returns(Task.FromResult(true)).Verifiable();
+            _backgroundActionService.Setup(s => s.AddAttachmentInBackgroundAsync(entryRef, attachment1, "pathToFile1")).Returns(Task.FromResult(true)).Verifiable();
+            _backgroundActionService.Setup(s => s.SetThumbnailInBackgroundAsync(entryRef, attachment1, "pathToFile1")).Returns(Task.FromResult(true)).Verifiable();
+            _backgroundActionService.Setup(s => s.AddAttachmentInBackgroundAsync(entryRef, attachment2, "pathToFile2")).Returns(Task.FromResult(true)).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
 
             _viewModel.SaveEntryCommand.Execute();
@@ -339,7 +342,7 @@ namespace Barembo.App.Core.Test.ViewModels
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(false)).Verifiable();
+            _backgroundActionService.Setup(s => s.AddAttachmentInBackgroundAsync(entryRef, attachment, "pathToFile")).Returns(Task.FromResult(false)).Verifiable();
             
             _viewModel.SaveEntryCommand.Execute();
 
@@ -371,8 +374,8 @@ namespace Barembo.App.Core.Test.ViewModels
             _eventAggregator.Setup(s => s.GetEvent<InAppInfoMessage>()).Returns(new InAppInfoMessage()).Verifiable();
             _entryServiceMock.Setup(s => s.CreateEntry(_viewModel.Header, _viewModel.Body)).Returns(entry).Verifiable();
             _entryServiceMock.Setup(s => s.AddEntryToBookAsync(bookReference, entry)).Returns(Task.FromResult(entryRef)).Verifiable();
-            _entryServiceMock.Setup(s => s.AddAttachmentAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
-            _entryServiceMock.Setup(s => s.SetThumbnailAsync(entryRef, entry, attachment, attachmentBinary, "pathToFile")).Returns(Task.FromResult(false)).Verifiable();
+            _backgroundActionService.Setup(s => s.AddAttachmentInBackgroundAsync(entryRef, attachment, "pathToFile")).Returns(Task.FromResult(true)).Verifiable();
+            _backgroundActionService.Setup(s => s.SetThumbnailInBackgroundAsync(entryRef, attachment, "pathToFile")).Returns(Task.FromResult(false)).Verifiable();
 
             _viewModel.SaveEntryCommand.Execute();
 
