@@ -201,6 +201,7 @@ namespace Barembo.App.Core.ViewModels
             Body = "";
             Attachments.Clear();
             Books.Clear();
+            _entry = null;
 
             foreach(var book in bookShelfViewModel.Books)
             {
