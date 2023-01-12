@@ -104,12 +104,12 @@ namespace Barembo.App.Core.ViewModels
                 try
                 {
                     tryCount++;
-                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess); //Crashes as Bookshelf is created on the UI-thread with ConfigureAwait;
+                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
                 }catch
                 {
                     tryCount++;
                     await Task.Delay(1000); 
-                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess); //Crashes as Bookshelf is created on the UI-thread with ConfigureAwait;
+                    BookShelf = await _bookShelfService.LoadBookShelfAsync(storeAccess);
                 }
 
                 foreach (var bookReference in BookShelf.Content)

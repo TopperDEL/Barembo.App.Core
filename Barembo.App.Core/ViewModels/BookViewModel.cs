@@ -79,7 +79,7 @@ namespace Barembo.App.Core.ViewModels
         {
             _eventAggregator.GetEvent<ShowBookEntriesMessage>().Publish(BookReference);
         }
-
+        
         internal BookViewModel(IBookService bookService, IEntryService entryService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator)
         {
             _bookService = bookService;
@@ -91,7 +91,7 @@ namespace Barembo.App.Core.ViewModels
         public static async Task<BookViewModel> CreateAsync(IBookService bookService, IEntryService entryService, BookShelfViewModel bookShelfViewModel, IEventAggregator eventAggregator, BookReference bookReference)
         {
             var bookVM = new BookViewModel(bookService, entryService, bookShelfViewModel, eventAggregator);
-            await bookVM.InitAsync(bookReference).ConfigureAwait(false);
+            _= bookVM.InitAsync(bookReference);
 
             return bookVM;
         }
@@ -103,20 +103,19 @@ namespace Barembo.App.Core.ViewModels
             try
             {
                 BookReference = bookReference;
-                Book = await _bookService.LoadBookAsync(BookReference).ConfigureAwait(false);
+                Book = await _bookService.LoadBookAsync(BookReference);
                 if(string.IsNullOrEmpty(Book.CoverImageBase64))
                 {
                     try
                     {
-                        var entryReferences = await _entryService.ListEntriesAsync(bookReference).ConfigureAwait(false);
+                        var entryReferences = await _entryService.ListEntriesAsync(bookReference);
                         EntryCount = entryReferences.Count();
                         RaisePropertyChanged(nameof(EntryCount));
-
                         try
                         {
                             foreach (var entryReference in entryReferences)
                             {
-                                var entry = await _entryService.LoadEntryAsync(entryReference).ConfigureAwait(false);
+                                var entry = await _entryService.LoadEntryAsync(entryReference);
                                 if (!string.IsNullOrEmpty(entry.ThumbnailBase64))
                                 {
                                     Book.CoverImageBase64 = entry.ThumbnailBase64;
