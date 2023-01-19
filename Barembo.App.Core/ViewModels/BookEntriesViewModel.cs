@@ -1,4 +1,5 @@
 ﻿using Barembo.App.Core.Messages;
+using Barembo.Models;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -18,6 +19,13 @@ namespace Barembo.App.Core.ViewModels
         {
             get { return _entries; }
             set { SetProperty(ref _entries, value); }
+        }
+
+        private EntryViewModel selectedEntry;
+        public EntryViewModel SelectedEntry
+        {
+            get { return selectedEntry; }
+            set { SetProperty(ref selectedEntry, value); }
         }
 
         private DelegateCommand _goBackCommand;
